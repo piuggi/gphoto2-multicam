@@ -34,15 +34,21 @@ function Gphoto2(options,cb){
   console.log('\n\r'+"Operating System: "+os.platform()+'\n\r');
 
   //if mac osx
-  var killAll = exec('killall PTPCamera && killall gphoto2',function (error, stdout, stderr) {
+  var killAll = exec('killall PTPCamera',function (error, stdout, stderr) {
     console.log('killall PTPCamera');
-    if(error) console.log(error);
+    //if(error) console.log(error);
     if(stdout) console.log(stdout);
     if(stderr) console.log(stderr);
-    _gphoto.getCameras(function(err){
-      if(err) return console.log(err);
-      cb();
-    });
+      var killAll = exec('killall gphoto2',function (error, stdout, stderr) {
+          console.log('killall gphoto2');
+          //if(error) console.log(error);
+          if(stdout) console.log(stdout);
+          if(stderr) console.log(stderr);
+          _gphoto.getCameras(function(err){
+            if(err) return console.log(err);
+            cb();
+          });
+      });
   });
 }
 //RETURN Cameras or Method Chaining?

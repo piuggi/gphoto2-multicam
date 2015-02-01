@@ -27,7 +27,8 @@ Camera.prototype.liveview = function(cb){
     if(!this.videoStream.connected){
       //if mac osx
       var killAll = exec('killall PTPCamera',function (error, stdout, stderr) {
-         if(error) console.log(error);
+         console.log('killall PTPCamera');
+         //if(error) console.log(error);
          if(stdout) console.log(stdout);
          if(stderr) console.log(stderr);
          _this.videoStream = spawn('ffserver',['-f','/etc/ffserver.conf','|','gphoto2', '--capture-movie','--port='+_this.port]);
@@ -80,17 +81,13 @@ Camera.prototype.tether = function(cb){
       if(this.videoStream.connected) this.videoStream.kill('SIGTERM');
 
       if(!this.tethered.connected){
-
+        console.log('Camera '+_this.index+' Tethering');
         //run conditional check on OS to kill Camera linkers
         var killAll = exec('killall PTPCamera',function (error, stdout, stderr) {
-          if(error)
-            console.log(error);
-
-          if(stdout)
-            console.log(stdout);
-
-          if(stderr)
-            console.log(stderr);
+          console.log('Camera '+_this.index+'killall PTPCamera');
+          //if(error)console.log(error);
+          if(stdout)console.log(stdout);
+          if(stderr)console.log(stderr);
 
 
           _this.tethered = spawn('gphoto2',['--capture-tethered','--force-overwrite','--port='+_this.port,'--filename='+_this.filename]);
@@ -103,7 +100,7 @@ Camera.prototype.tether = function(cb){
           _this.tethered.stderr.on('data',tetheredStd);
 
           _this.tethered.on('close',function(code,signal){
-            console.log('[ tethering: '+_this.tethered.pid+' ] ');
+            console.log('Camera '+_this.index+' [ tethering ] [ pid '+_this.tethered.pid+' ] ');
             console.log('Terminated with Signal [ '+signal+' ] Code [ '+code+' ]');
             _this.tethered.connected = false;
           });
