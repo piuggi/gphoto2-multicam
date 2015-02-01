@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "gulp": "^3.8.10",
+    "gulp-watch": "^4.1.0"
+  }
+}
