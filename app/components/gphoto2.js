@@ -2,7 +2,6 @@ var spawn = require('child_process').spawn;
 var exec  = require('child_process').exec;
 var os = require('os');
 var async = require('async');
-var colors = require('colors');
 
 var Camera = require('./camera');
 
@@ -95,16 +94,34 @@ Gphoto2.prototype.settings = function(opts,cb){
 //TODO add a take number to the process
 Gphoto2.prototype.takePhotos = function(){
   console.log("Gphoto2.takePhotos()".yellow);
-  // for(var i = 0, len = this.cameras.length; i<len; i++){
-  async.each(this.cameras, i, function(camera, _cb){
-    this.cameras[i].captureAndDownload( function(err, cam){
-      if(err) console.log("captureAndDownload err: ".red+err);
-      _cb();
-    }, function(e){
-      if(e) console.log("e: ".red+e);
-      console.log(">>> finished gphoto.takePhotos".green);
-    });
-  });
+
+  //--- for loop strategy
+  var result = function(err, cam){ if(err) console.log("captureAndDownload err: ".red+err);};
+  for(var i = 0, len = this.cameras.length; i<len; i++){
+    this.cameras[i].captureAndDownload( result );
+  }
+
+  // --- async EACH
+  // async.each(this.cameras, function(camera, _cb){
+  //   camera.captureAndDownload( function(err, cam){
+  //     if(err) console.log("captureAndDownload err: ".red+err);
+  //     _cb();
+  //   });
+  // }, function(e){
+  //     if(e) console.log("e: ".red+e);
+  //     console.log(">>> finished gphoto.takePhotos eachSeries".green);
+  // });
+
+  //--- async EACH IN SERIES
+  // async.eachSeries(this.cameras, function(camera, _cb){
+  //   camera.captureAndDownload( function(err, cam){
+  //     if(err) console.log("captureAndDownload err: ".red+err);
+  //     _cb();
+  //   });
+  // }, function(e){
+  //     if(e) console.log("e: ".red+e);
+  //     console.log(">>> finished gphoto.takePhotos eachSeries".green);
+  // });
 };
 
 Gphoto2.prototype.tetherAll = function(){

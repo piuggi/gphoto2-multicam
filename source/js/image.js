@@ -37,7 +37,14 @@ var _ButtonToolbar = function(image){
   this.btngroup.appendChild(new _Button(image,'approve', 'ok', image.hearted));
   this.btngroup.appendChild(new _Button(image,'heart', 'heart', image.approved));
 
+  this.imgLabel = document.createElement("p");
+  this.imgLabel.className = "help-block";
+  this.imgLabel.html = "test htmllll";
+  // this.imgLabel.setAttribute("text", "test text over here");
+
+
   this.btntoolbar.appendChild(this.btngroup);
+  this.btngroup.appendChild(this.imgLabel);
 
   return this.btntoolbar;
 };
