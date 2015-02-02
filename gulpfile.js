@@ -15,6 +15,9 @@ var gulp = require('gulp'),
     var LessPluginAutoPrefix = require('less-plugin-autoprefix'),
         autoprefix= new LessPluginAutoPrefix({browsers: ["last 2 versions"]});
 
+    var bStarted = false;
+    var App={};
+
 /* gulp setup */
 gulp.task('styles',function(){
   return gulp.src('source/less/*.less')
@@ -46,12 +49,19 @@ gulp.task('clean', function(cb) {
 });
 
 gulp.task('default',['clean'],function(){
-  gulp.start('styles', 'scripts', 'images','watch');
+  gulp.start('styles', 'scripts', 'images','watch','startup');
 });
 
+gulp.task('startup',function(cb){
+  if(App.hasOwnProperty("connected")) if(App.connected) App.kill('SIGTERM');
+  App = require('child_process').fork('app',[]);
+  App.on('close', function (code, signal) {
+    console.log('App '+App.pid+' terminated due to receipt of signal '+signal);
+  });
+  cb();
+});
 
 gulp.task('watch', function() {
-  console.log('watch');
   // Watch .scss files
   gulp.watch('source/less/*.less', ['styles']);
 
@@ -61,6 +71,10 @@ gulp.task('watch', function() {
   // Watch image files
   gulp.watch('src/images/*', ['images']);
 
+  var appWatcher = gulp.watch(['app/*.js','app/**/*.js'],['startup']);
+  appWatcher.on('change',function(event){
+    console.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
+  });
   // Create LiveReload server
   livereload.listen();
 

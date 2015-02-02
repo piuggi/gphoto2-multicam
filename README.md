@@ -12,10 +12,3 @@ $ npm install
 $ gulp
 
 ```
-
-Open New Tab:
-
-```
-$ cd /path/to/repo
-$ node app.js
-```

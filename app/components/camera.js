@@ -31,7 +31,12 @@ Camera.prototype.liveview = function(cb){
          //if(error) console.log(error);
          if(stdout) console.log(stdout);
          if(stderr) console.log(stderr);
-         _this.videoStream = spawn('ffserver',['-f','/etc/ffserver.conf','|','gphoto2', '--capture-movie','--port='+_this.port]);
+         _this.videoStream = spawn('ffserver',[ '-f',
+                                                '/etc/ffserver.conf',
+                                                '|',
+                                                'gphoto2',
+                                                '--capture-movie',
+                                                '--port='+_this.port ]);
          _this.videoStream.connected = true;
 
            //videoStream.on('error',function())
@@ -58,9 +63,16 @@ Camera.prototype.liveview = function(cb){
 /* Capture Image and Download */
 
 Camera.prototype.captureAndDownload = function(cb){
-  var _this = this;
+    var _this = this;
     console.log('Camera '+this.index+' Requesting Photo');
-    var captureDownload = spawn('gphoto2',["--capture-image-and-download", "--port="+this.port, "--filename="+this.filename]);
+
+    if(this.videoStream.connected) this.videoStream.kill('SIGTERM');
+    if(this.tethered.connected) this.tethered.kill('SIGTERM');
+
+    var captureDownload = spawn('gphoto2',[ "--capture-image-and-download",
+                                            "--port="+this.port,
+                                            "--filename="+this.filename,
+                                            "--force-overwrite"]);
 
     captureDownload.stdout.setEncoding('utf8');
     captureDownload.stderr.setEncoding('utf8');
@@ -71,6 +83,12 @@ Camera.prototype.captureAndDownload = function(cb){
     captureDownload.stderr.on('data',function(data){
       console.log('Camera '+_this.index+' Error!\t'+'gphoto2 --capture-image-and-download');
       console.log(data);
+    });
+
+    captureDownload.on('close', function(code,signal){
+      console.log('Camera '+_this.index+' [ capture-image-and-download ] [ pid '+captureDownload.pid+' ] ');
+      console.log('Terminated with Signal [ '+signal+' ] Code [ '+code+' ]');
+      _this.tether(cb);
     });
 };
 
@@ -84,13 +102,16 @@ Camera.prototype.tether = function(cb){
         console.log('Camera '+_this.index+' Tethering');
         //run conditional check on OS to kill Camera linkers
         var killAll = exec('killall PTPCamera',function (error, stdout, stderr) {
-          console.log('Camera '+_this.index+'killall PTPCamera');
+          console.log('Camera '+_this.index+' killall PTPCamera');
           //if(error)console.log(error);
           if(stdout)console.log(stdout);
           if(stderr)console.log(stderr);
 
 
-          _this.tethered = spawn('gphoto2',['--capture-tethered','--force-overwrite','--port='+_this.port,'--filename='+_this.filename]);
+          _this.tethered = spawn('gphoto2',[  '--capture-tethered',
+                                              '--port='+_this.port,
+                                              '--filename='+_this.filename,
+                                              '--force-overwrite']);
           _this.tethered.connected = true;
 
           //tethered.on('error',function())

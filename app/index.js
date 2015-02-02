@@ -1,21 +1,23 @@
 var fs = require('fs');
 var gulp = require('gulp');
+
 /* Simple Express and Socket to pass info. */
 var express =require('express');
 var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 
-var Images = require('./models/images');
+
+var Images = require(__dirname+'/models/images');
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/gphoto2');
 
-var Gphoto2 = require('./components/gphoto2');
+var Gphoto2 = require(__dirname+'/components/gphoto2');
 
-if (!fs.existsSync('./images')) fs.mkdirSync('./images');
+if (!fs.existsSync(__dirname+'/images')) fs.mkdirSync(__dirname+'/images');
 
 /* Gulp Watcher */
-var watcher = gulp.watch('images/*.jpg');
+var watcher = gulp.watch(__dirname+'/images/*.jpg');
 
 watcher.on('change',function(event){
 
@@ -55,4 +57,5 @@ io.on('connection',function(socket){
       return socket.emit('images',_images);
     });
   });
+  
 });
