@@ -1,8 +1,11 @@
 var spawn = require('child_process').spawn;
 var exec  = require('child_process').exec;
 var os = require('os');
+var async = require('async');
+var colors = require('colors');
 
 var Camera = require('./camera');
+
 /*
 
   Gphoto2 Shell Connection
@@ -21,7 +24,7 @@ function Gphoto2(options,cb){
   var _gphoto = this;
   this.stuff = 'stuff';
 
-  console.log('gphoto helper starting');
+  console.log('gphoto helper starting'.green);
 
   this.cameras = []; //
 
@@ -91,17 +94,31 @@ Gphoto2.prototype.settings = function(opts,cb){
 };
 //TODO add a take number to the process
 Gphoto2.prototype.takePhotos = function(){
-
-  for(var i = 0, len = this.cameras.length; i<len; i++) this.cameras[i].captureAndDownload();
-
+  console.log("Gphoto2.takePhotos()".yellow);
+  // for(var i = 0, len = this.cameras.length; i<len; i++){
+  async.each(this.cameras, i, function(camera, _cb){
+    this.cameras[i].captureAndDownload( function(err, cam){
+      if(err) console.log("captureAndDownload err: ".red+err);
+      _cb();
+    }, function(e){
+      if(e) console.log("e: ".red+e);
+      console.log(">>> finished gphoto.takePhotos".green);
+    });
+  });
 };
 
 Gphoto2.prototype.tetherAll = function(){
-
-  for(var i = 0, len = this.cameras.length; i<len; i++) this.cameras[i].tether(function(){});
+  console.log("Gphoto2.tetherAll()".yellow);
+  for(var i = 0, len = this.cameras.length; i<len; i++){
+    this.cameras[i].tether(function(err, cam){
+      if(err) console.log("tetherAll err: ".red+err);
+    });
+  }
 };
 Gphoto2.prototype.tether = function(index){
-  this.cameras[index].tether(function(){});
+  this.cameras[index].tether(function(err, cam){
+    if(err) console.log("tether err: ".red+err);
+  });
 };
 
 Gphoto2.prototype.get = function(obj,cb){

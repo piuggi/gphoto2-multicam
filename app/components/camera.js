@@ -86,8 +86,8 @@ Camera.prototype.captureAndDownload = function(cb){
     });
 
     captureDownload.on('close', function(code,signal){
-      console.log('Camera '+_this.index+' [ capture-image-and-download ] [ pid '+captureDownload.pid+' ] ');
-      console.log('Terminated with Signal [ '+signal+' ] Code [ '+code+' ]');
+      console.log('Camera '+_this.index+' [ capture-image-and-download ]'.red+' [ pid '+captureDownload.pid+' ] ');
+      console.log('Terminated with Signal [ '.gray+signal+' ] Code [ '+code+' ]');
       _this.tether(cb);
     });
 };
@@ -99,7 +99,7 @@ Camera.prototype.tether = function(cb){
       if(this.videoStream.connected) this.videoStream.kill('SIGTERM');
 
       if(!this.tethered.connected){
-        console.log('Camera '+_this.index+' Tethering');
+        console.log('Camera '.gray+_this.index+' [tethering now]'.green);
         //run conditional check on OS to kill Camera linkers
         var killAll = exec('killall PTPCamera',function (error, stdout, stderr) {
           console.log('Camera '+_this.index+' killall PTPCamera');
@@ -121,8 +121,8 @@ Camera.prototype.tether = function(cb){
           _this.tethered.stderr.on('data',tetheredStd);
 
           _this.tethered.on('close',function(code,signal){
-            console.log('Camera '+_this.index+' [ tethering ] [ pid '+_this.tethered.pid+' ] ');
-            console.log('Terminated with Signal [ '+signal+' ] Code [ '+code+' ]');
+            console.log('Camera '+_this.index+' [ tethering terminated ]'.red+' [ pid '+_this.tethered.pid+' ] ');
+            console.log('Terminated with Signal [ '.gray+signal+' ] Code [ '.gray+code+' ]'.gray);
             _this.tethered.connected = false;
           });
 
@@ -130,7 +130,7 @@ Camera.prototype.tether = function(cb){
         });
       }else{
         //console.log('[gphoto2][warn] Tether Already Connected')
-        cb('[gphoto2][warn][Warn] Already Tethered to Camera',this.tethered);
+        cb('[gphoto2][warn][Warn]'.red+' Already Tethered to Camera',this.tethered);
       }
   };
 

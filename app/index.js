@@ -7,7 +7,6 @@ var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 
-
 var Images = require(__dirname+'/models/images');
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/gphoto2');
@@ -83,4 +82,8 @@ io.on('connection',function(socket){
     });
   });
 
+  socket.on('snap',function(data){
+    console.log('Snap: '+JSON.stringify(data));
+    gphoto.takePhotos();
+  });
 });
