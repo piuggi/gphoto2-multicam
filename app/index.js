@@ -17,24 +17,31 @@ var Gphoto2 = require(__dirname+'/components/gphoto2');
 if (!fs.existsSync(__dirname+'/images')) fs.mkdirSync(__dirname+'/images');
 
 /* Gulp Watcher */
-var watcher = gulp.watch(__dirname+'/images/*.jpg');
+var watchr = require('watchr');
+watchr.watch({
+    path:'./app/images/',
+    listener:  function(changeType,filePath,fileCurrentStat,filePreviousStat){
+            //console.log('a change event occured:',arguments);
 
-watcher.on('change',function(event){
 
-    switch(event.type){
-      case 'added':
-        console.log('File Added: '+event.path);
-        var img = new Images();
-        img.path = event.path.substr(event.path.lastIndexOf('/')+1);
-        img.save(function(){
-          io.sockets.emit('images',[img]);
-        });
-        break;
-      default:
-        console.log(event.type);
-        break;
-    }
+            switch(changeType){
+              case 'create':
+                console.log('File Added: '+filePath);
+                var img = new Images();
+                img.path = filePath.substr(filePath.lastIndexOf('/')+1);
+                //console.log(img.path);
+                img.save(function(){
+                  io.sockets.emit('images',[img]);
+                });
+                break;
+              default:
+                console.log('changeType: '+changeType+' filePath: '+filePath);
+                break;
+            }
+        }
+
 });
+
 
 var gphoto = new Gphoto2({},function(){
   //auto tether
@@ -42,20 +49,20 @@ var gphoto = new Gphoto2({},function(){
 });
 
 /* Simple Express and Socket to pass info. */
-app.use(express.static(__dirname + '/public'));
+app.use(express.static('./public'));
 app.use('/images',express.static(__dirname +'/images'));
 app.listen(process.env.PORT || 8080);
 server.listen(8081);
 console.log('App Running on port'+(process.env.PORT || 8080));
 
 io.on('connection',function(socket){
-  fs.readdir('./images',function(err,files){
-
+  fs.readdir(__dirname+'/images',function(err,files){
+    //console.log(files)
     //find and modify image paths
     Images.findOrCreate(files,function(err,_images){
       if(err) return socket.emit('error',err);
       return socket.emit('images',_images);
     });
   });
-  
+
 });

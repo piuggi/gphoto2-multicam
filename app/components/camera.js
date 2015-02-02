@@ -12,7 +12,7 @@ function Camera(string,index){
   this.type = parse[0];
   this.port = parse[1];
   this.index = index;
-  this.filename= "images/%m_%d_%y-%H.%M.%S-camera"+this.index+".%C";
+  this.filename= "app/images/%m_%d_%y-%H.%M.%S-camera"+this.index+".%C";
   console.log("Type: "+this.type+"\tPort: "+this.port);
   this.tethered = this.videoStream = {connected: false};
 }
