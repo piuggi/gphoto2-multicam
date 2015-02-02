@@ -78,7 +78,7 @@ gulp.task('watch', function() {
   // Create LiveReload server
   livereload.listen();
 
-  // Watch any files in dist/, reload on change
-  gulp.watch(['dist/**']).on('change', livereload.changed);
+  // Watch any files in public/, reload on change
+  gulp.watch(['public/**']).on('change', livereload.changed);
 
 });

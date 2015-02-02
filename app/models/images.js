@@ -10,6 +10,16 @@ var Images = mongoose.Schema({
 
 });
 
+Images.methods.approve = function(cb){
+  this.approved = !this.approved;
+  this.save(cb);
+};
+
+Images.methods.heart = function(cb){
+  this.hearted = !this.hearted;
+  this.save(cb);
+};
+
 Images.statics.findOrCreate = function(files,callback){//function(query, sort, doc, options, callback){
   var self = this;
   this.collection.find({path:{$in:files}}).toArray(function(err,_files){

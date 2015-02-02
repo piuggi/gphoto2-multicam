@@ -21,20 +21,17 @@ var watchr = require('watchr');
 watchr.watch({
     path:'./app/images/',
     listener:  function(changeType,filePath,fileCurrentStat,filePreviousStat){
-            //console.log('a change event occured:',arguments);
-
-
             switch(changeType){
               case 'create':
                 console.log('File Added: '+filePath);
                 var img = new Images();
                 img.path = filePath.substr(filePath.lastIndexOf('/')+1);
-                //console.log(img.path);
                 img.save(function(){
                   io.sockets.emit('images',[img]);
                 });
                 break;
               default:
+                //console.log('a change event occured:',arguments);
                 console.log('changeType: '+changeType+' filePath: '+filePath);
                 break;
             }
@@ -62,6 +59,27 @@ io.on('connection',function(socket){
     Images.findOrCreate(files,function(err,_images){
       if(err) return socket.emit('error',err);
       return socket.emit('images',_images);
+    });
+  });
+
+  /* Socket API */
+  socket.on('approve',function(data){
+    console.log('Approve: '+JSON.stringify(data));
+    Images.findById(data._id,function(err,image){
+      image.approve(function(err,_img){
+        //TODO Add socket emit to update all connections.
+        console.log('Approved.');
+      });
+    });
+  });
+
+  socket.on('heart',function(data){
+    console.log('Heart: '+JSON.stringify(data));
+    Images.findById(data._id,function(err,image){
+      image.heart(function(err,_img){
+        //TODO Add socket emit to update all connections.
+        console.log('Hearted.');
+      });
     });
   });
 
