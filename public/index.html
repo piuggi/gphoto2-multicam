@@ -38,6 +38,7 @@
           <a class="navbar-brand" href="#">Project name</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
+          <button type="button" class="btn btn-default">Take Photo <span class="glyphicon glyphicon-camera"></span></button>
 
         </div><!--/.navbar-collapse -->
       </div>
@@ -51,7 +52,13 @@
           <div class="thumbnail">
             <img src="/images/02_01_15-15.32.28-camera1.jpg">
             <div class="caption">
-              <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
+              <div class="btn-toolbar" role="toolbar" aria-label="...">
+                <div class="btn-group" role="group" aria-label="...">
+                  <button class="btn btn-default details" href="#" role="button"><span class="glyphicon glyphicon-search"></span></button>
+                  <button class="btn btn-default approve" href="#" role="button"><span class="glyphicon glyphicon-ok"></span></button>
+                  <button class="btn btn-default heart" href="#" role="button"><span class="glyphicon glyphicon-heart"></span></button>
+                </div><!-- btn-group -->
+              </div><!-- btn-toolbar
             </div><!--.caption-->
           </div><!--.thumbnail-->
         </div><!--.image-->
@@ -59,10 +66,11 @@
 
       <hr/>
 
-      <footer>
-        <p>&copy; Company 2014</p>
-      </footer>
+
     </div> <!-- /container -->
+    <footer>
+      <p>&copy; Company 2014</p>
+    </footer>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
         <script>window.jQuery || document.write('<script src="/vendor/js/jquery-1.11.1.min.js"><\/script>')</script>
 
