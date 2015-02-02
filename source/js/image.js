@@ -50,7 +50,10 @@ var _Button = function(image,cl,glyph,state){
   this.span.className = "glyphicon glyphicon-"+glyph;
 
   this.btn = document.createElement("button");
-  this.btn.className = (state)? "btn btn-default "+cl+" disabled" : "btn btn-default "+cl;
+
+  if(cl == 'approve') this.btn.className = (state)? "btn btn-primary "+cl+" disabled" : "btn btn-default "+cl;
+  else if(cl == 'heart') this.btn.className = (state)? "btn btn-danger "+cl+" disabled" : "btn btn-default "+cl;
+  else this.btn.className = (state)? "btn btn-default "+cl+" disabled" : "btn btn-default "+cl;
 
   this.btn.setAttribute("role", "button");
   this.btn.setAttribute("type", "button");
@@ -61,7 +64,8 @@ var _Button = function(image,cl,glyph,state){
         console.log('here');
         if(!state){
           socket.emit(cl,{_id: image._id});
-          _this.btn.className += " disabled";
+          if(cl == 'approve') _this.btn.className = "btn btn-primary "+cl+" disabled";
+          else if(cl == 'heart') _this.btn.className = "btn btn-danger "+cl+" disabled";
         }
         break;
       default:
