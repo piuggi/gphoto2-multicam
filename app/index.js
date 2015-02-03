@@ -88,16 +88,16 @@ io.on('connection',function(socket){
   });
 
   socket.on('snap',function(data){
-    console.log('Take Photo! '.green+JSON.stringify(data));
+    console.log('Snap Photo! '.green+JSON.stringify(data));
     //gphoto.takePhotos();
-    async.eachLimit(cameras_, 5, function(cam, cb){
+    async.each(cameras_, function(cam, cb){
       console.log("take picture on cam: "+JSON.stringify(cam));
       cam.takePicture({
         targetPath: '/tmp/foo.XXXXXX'
       }, function (er, tmpname) {
         var filePath =  __dirname + '/images/'+new Date().getMinutes()+"."+new Date().getSeconds()+'_cam_'+cam.id+'.jpg'
         fs.renameSync(tmpname, filePath.toString());
-        cb();
+        cb(er);
       });
     }, function(e){
       console.log(">> completed snap".green);
