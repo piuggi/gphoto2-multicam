@@ -101,7 +101,7 @@ Gphoto2.prototype.takePhotos = function(){
     this.cameras[i].captureAndDownload( result );
   }
 
-  // --- async EACH
+  // --- async EACH strategy
   // async.each(this.cameras, function(camera, _cb){
   //   camera.captureAndDownload( function(err, cam){
   //     if(err) console.log("captureAndDownload err: ".red+err);
@@ -112,7 +112,7 @@ Gphoto2.prototype.takePhotos = function(){
   //     console.log(">>> finished gphoto.takePhotos eachSeries".green);
   // });
 
-  //--- async EACH IN SERIES
+  //--- async EACH IN SERIES strategy
   // async.eachSeries(this.cameras, function(camera, _cb){
   //   camera.captureAndDownload( function(err, cam){
   //     if(err) console.log("captureAndDownload err: ".red+err);
