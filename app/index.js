@@ -95,8 +95,8 @@ io.on('connection',function(socket){
       cam.takePicture({
         targetPath: '/tmp/foo.XXXXXX'
       }, function (er, tmpname) {
-        var fileName =  __dirname + '/images/'+new Date().getMinutes()+"."+new Date().getSeconds()+'_cam_'+cam.id+'.jpg'
-        fs.renameSync(tmpname, fileName.toString());
+        var filePath =  __dirname + '/images/'+new Date().getMinutes()+"."+new Date().getSeconds()+'_cam_'+cam.id+'.jpg'
+        fs.renameSync(tmpname, filePath.toString());
         cb();
       });
     }, function(e){
@@ -116,7 +116,7 @@ _GPhoto.list(function (list) {
     var thisCam = list[i];
     thisCam.id=i;
     cameras_[i] = thisCam;
-    console.log('Found Camera '.cyan+i, thisCam.model, 'on port '.gray, thisCam.port);
+    console.log('Found Camera '.cyan+i, 'model'.gray, thisCam.model, 'on port'.gray, thisCam.port);
   }
 
 
