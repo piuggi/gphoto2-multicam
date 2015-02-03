@@ -2,6 +2,10 @@ var fs = require('fs');
 var gulp = require('gulp');
 var colors = require('colors');
 var _ = require('lodash');
+var async = require('async');
+
+var _gphoto2 = require('gphoto2');
+var _GPhoto = new _gphoto2.GPhoto2();
 
 /* Simple Express and Socket to pass info. */
 var express =require('express');
@@ -13,7 +17,7 @@ var Images = require(__dirname+'/models/images');
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/gphoto2');
 
-var Gphoto2 = require(__dirname+'/components/gphoto2');
+// var Gphoto2 = require(__dirname+'/components/gphoto2');
 
 if (!fs.existsSync(__dirname+'/images')) fs.mkdirSync(__dirname+'/images');
 
@@ -41,10 +45,10 @@ watchr.watch({
 });
 
 
-var gphoto = new Gphoto2({},function(){
+//var gphoto = new Gphoto2({},function(){
   //auto tether
-  gphoto.tetherAll();
-});
+  //gphoto.tetherAll();
+//});
 
 /* Simple Express and Socket to pass info. */
 app.use(express.static('./public'));
@@ -85,6 +89,47 @@ io.on('connection',function(socket){
 
   socket.on('snap',function(data){
     console.log('Take Photo! '.green+JSON.stringify(data));
-    gphoto.takePhotos();
+    //gphoto.takePhotos();
+    async.eachLimit(cameras_, 5, function(cam, cb){
+      console.log("take picture on cam: "+JSON.stringify(cam));
+      cam.takePicture({
+        targetPath: '/tmp/foo.XXXXXX'
+      }, function (er, tmpname) {
+        var fileName =  __dirname + '/images/'+new Date().getMinutes()+"."+new Date().getSeconds()+'_cam_'+cam.id+'.jpg'
+        fs.renameSync(tmpname, fileName.toString());
+        cb();
+      });
+    }, function(e){
+      console.log(">> completed snap".green);
+    });
   });
+});
+
+
+// List cameras / assign list item to variable to use below options
+var cameras_ = [];
+_GPhoto.list(function (list) {
+  if (list.length === 0) return;
+  // var camera = list[0];
+  cameras_ = list;
+  for(var i=0; i<list.length; i++){
+    var thisCam = list[i];
+    thisCam.id=i;
+    cameras_[i] = thisCam;
+    console.log('Found Camera '.cyan+i, thisCam.model, 'on port '.gray, thisCam.port);
+  }
+
+
+//--- get configuration tree of camera[0]
+  //camera.getConfig(function (er, settings) {
+    //console.log(settings);
+  //});
+
+//--- take and save a picture
+//   camera.takePicture({
+//   targetPath: '/tmp/foo.XXXXXX'
+// }, function (er, tmpname) {
+//   fs.renameSync(tmpname, __dirname + '/picture.jpg');
+// });
+
 });
