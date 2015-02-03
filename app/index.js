@@ -1,12 +1,13 @@
 var fs = require('fs');
 var gulp = require('gulp');
+var colors = require('colors');
+var _ = require('lodash');
 
 /* Simple Express and Socket to pass info. */
 var express =require('express');
 var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
-
 
 var Images = require(__dirname+'/models/images');
 var mongoose = require('mongoose');
@@ -23,7 +24,7 @@ watchr.watch({
     listener:  function(changeType,filePath,fileCurrentStat,filePreviousStat){
             switch(changeType){
               case 'create':
-                console.log('File Added: '+filePath);
+                console.log('File Added: '.green+filePath);
                 var img = new Images();
                 img.path = filePath.substr(filePath.lastIndexOf('/')+1);
                 img.save(function(){
@@ -54,9 +55,8 @@ console.log('App Running on port'+(process.env.PORT || 8080));
 
 io.on('connection',function(socket){
   fs.readdir(__dirname+'/images',function(err,files){
-    //console.log(files)
-    //find and modify image paths
-    Images.findOrCreate(files,function(err,_images){
+    //checkout /images for all image files, (exclude DS_Store);
+    Images.findOrCreate(_.without(files, ".DS_Store"),function(err,_images){
       if(err) return socket.emit('error',err);
       return socket.emit('images',_images);
     });
@@ -83,4 +83,8 @@ io.on('connection',function(socket){
     });
   });
 
+  socket.on('snap',function(data){
+    console.log('Take Photo! '.green+JSON.stringify(data));
+    gphoto.takePhotos();
+  });
 });

@@ -1,5 +1,5 @@
 var ImageElement = function(image){
-
+  // console.log("IMAGE : "+JSON.stringify(image,null,'\t'));
   this.imgHolder = document.createElement("div");
   this.imgHolder.className = "image col-xs-6 col-md-3 col-lg-4";
 
@@ -13,6 +13,7 @@ var ImageElement = function(image){
   this.caption.className = "caption";
 
   this.caption.appendChild(new _ButtonToolbar(image));
+  //this.caption.appendChild(this.imgLabel);
 
   this.thumbHolder.appendChild(this.img);
   this.thumbHolder.appendChild(this.caption);
@@ -37,7 +38,13 @@ var _ButtonToolbar = function(image){
   this.btngroup.appendChild(new _Button(image,'approve', 'ok', image.hearted));
   this.btngroup.appendChild(new _Button(image,'heart', 'heart', image.approved));
 
+  this.imagePath = document.createTextNode(image.path);
+  this.imgLabel = document.createElement("p");
+  this.imgLabel.appendChild(this.imagePath);
+  this.imgLabel.className = "label label-info image-path";
+
   this.btntoolbar.appendChild(this.btngroup);
+  this.btngroup.appendChild(this.imgLabel);
 
   return this.btntoolbar;
 };
