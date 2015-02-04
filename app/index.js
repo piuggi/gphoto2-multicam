@@ -112,11 +112,13 @@ _GPhoto.list(function (list) {
     thisCam.id=id;
     cameras_[id] = thisCam;
     console.log('Found Camera '.cyan+id, 'model'.gray, thisCam.model, 'on port'.gray, thisCam.port);
+    //take a picture with this cam.
     _thisCam.takePicture({download: true}, function (er, data) {
       fs.writeFileSync(__dirname + '/picture-'+id.toString()+'.jpg', data);
       id++;
       cb(er);
     });
+
   }, function(_e){
     if(_e) console.log("camera setup error: ".red + _e);
     console.log("camera setup complete".green);
