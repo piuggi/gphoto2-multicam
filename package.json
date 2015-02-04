@@ -4,6 +4,7 @@
     "colors": "^1.0.3",
     "del": "^1.1.1",
     "express": "^4.11.2",
+    "gphoto2": "^0.1.7",
     "gulp": "^3.8.10",
     "gulp-cache": "^0.2.4",
     "gulp-concat": "^2.4.3",
