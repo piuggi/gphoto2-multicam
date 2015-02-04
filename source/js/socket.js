@@ -1,3 +1,5 @@
+var socket = io.connect('http://127.0.0.1:8081');
+
 socket.on('images', function(images){
   //var imgDoc = document.getElementsByClassName("image")[0];
   var imagesHolder = document.getElementsByClassName("images")[0];
@@ -10,4 +12,9 @@ socket.on('images', function(images){
   }
   //console.log(imgDoc);
 
+});
+
+
+$('#take-photo').click(function(e){
+  socket.emit('snap',{snap: 0});
 });
