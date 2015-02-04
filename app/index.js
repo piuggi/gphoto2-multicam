@@ -55,7 +55,7 @@ app.use(express.static('./public'));
 app.use('/images',express.static(__dirname +'/images'));
 app.listen(process.env.PORT || 8080);
 server.listen(8081);
-console.log('App Running on port'+(process.env.PORT || 8080));
+console.log('\n--------------\nApp Running on port '.cyan+(process.env.PORT || 8080)+'\n--------------\n');
 
 io.on('connection',function(socket){
   fs.readdir(__dirname+'/images',function(err,files){
@@ -109,7 +109,10 @@ io.on('connection',function(socket){
 // List cameras / assign list item to variable to use below options
 var cameras_ = [];
 _GPhoto.list(function (list) {
-  if (list.length === 0) return;
+  if (list.length === 0){
+    console.log(" >>> NO CAMERAS FOUND <<< ".red.inverse);
+    return;
+  }
   // var camera = list[0];
   cameras_ = list;
   for(var i=0; i<list.length; i++){
