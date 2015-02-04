@@ -55,7 +55,7 @@ app.use(express.static('./public'));
 app.use('/images',express.static(__dirname +'/images'));
 app.listen(process.env.PORT || 8080);
 server.listen(8081);
-console.log('\n--------------\nApp Running on port '.cyan+(process.env.PORT || 8080)+'\n--------------\n');
+console.log('\n--------------\nApp Running on port '.cyan+(process.env.PORT || 8080)+'\n--------------\n'.cyan);
 
 io.on('connection',function(socket){
   fs.readdir(__dirname+'/images',function(err,files){
@@ -98,7 +98,7 @@ io.on('connection',function(socket){
         var filePath =  __dirname + '/images/'+new Date().getMinutes()+"."+new Date().getSeconds()+'_cam_'+cam.id+'.jpg'
         // fs.renameSync(tmpname, filePath.toString());
         // cb(er);
-        if(!tmpname) return cb("snap error: tmpname is undefined".red);
+        if(!tmpname) cb("snap error: tmpname is undefined".red);
         fs.rename(tmpname, filePath.toString(), function(_er){
           if(_er) return cb(_er);
           cb(er);
