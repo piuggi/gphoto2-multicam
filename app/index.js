@@ -1,3 +1,4 @@
+process.env.UV_THREADPOOL_SIZE = 8;
 var fs = require('fs');
 var gulp = require('gulp');
 var colors = require('colors');
@@ -22,6 +23,7 @@ var Gphoto2_CP = require(__dirname+'/components/gphoto2');
 var gphoto_CP_Init = new Gphoto2_CP({},function(){
   //auto tether
   //gphoto.tetherAll();
+  initCameras();
 });
 
 if (!fs.existsSync(__dirname+'/images')) fs.mkdirSync(__dirname+'/images');
@@ -97,50 +99,62 @@ io.on('connection',function(socket){
 });
 
 
-// List cameras / assign list item to variable to use below options
+function initCameras(){
+  // List cameras / assign list item to variable to use below options
 
-_GPhoto.list(function (list) {
-  if (list.length === 0){
-    console.log(" >>> NO CAMERAS FOUND <<< ".red.inverse);
-    return;
-  }
-  // var camera = list[0];
-  cameras_ = list;
-  // for(var i=0; i<list.length; i++){
-  var id=0;
-  async.eachSeries(list, function(_thisCam, cb){
-    var thisCam = _thisCam;
-    thisCam.id=id;
-    cameras_[id] = thisCam;
-    console.log('Found Camera '.cyan+id, 'model'.gray, thisCam.model, 'on port'.gray, thisCam.port);
-    //take a picture with this cam.
-    _thisCam.takePicture({download: true}, function (er, data) {
-      fs.writeFileSync(__dirname + '/picture-'+id.toString()+'.jpg', data);
+  _GPhoto.list(function (list) {
+    if (list.length === 0){
+      console.log(" >>> NO CAMERAS FOUND <<< ".red.inverse);
+      return;
+    }
+    // var camera = list[0];
+    cameras_ = list;
+    // for(var i=0; i<list.length; i++){
+    var id=0;
+    async.eachSeries(list, function(_thisCam, cb){
+      var thisCam = _thisCam;
+      thisCam.id=id;
+      cameras_[id] = thisCam;
+      console.log('Found Camera '.cyan+id, 'model'.gray, thisCam.model, 'on port'.gray, thisCam.port);
       id++;
-      cb(er);
+      cb();
+      //--- get configuration tree of camera[0]
+      // thisCam.getConfig(function (er, settings) {
+      // console.log(settings);
+      // id++;
+      // if(er){
+      //   console.log("ERROR - cam.getConfig: "+er);
+      // }
+      // cb(er);
+      // });
+      //take a picture with this cam.
+      // _thisCam.takePicture({download: true}, function (er, data) {
+      //   fs.writeFileSync(__dirname + '/picture-'+id.toString()+'.jpg', data);
+
+      // });
+
+    }, function(_e){
+      if(_e) console.log("camera setup error: ".red + _e);
+      console.log("camera setup complete".green);
     });
 
-  }, function(_e){
-    if(_e) console.log("camera setup error: ".red + _e);
-    console.log("camera setup complete".green);
-  });
-
-  // }
+    // }
 
 
-//--- get configuration tree of camera[0]
-  //camera.getConfig(function (er, settings) {
+    //--- get configuration tree of camera[0]
+    //camera.getConfig(function (er, settings) {
     //console.log(settings);
-  //});
+    //});
 
-//--- take and save a picture
-//   camera.takePicture({
-//   targetPath: '/tmp/foo.XXXXXX'
-// }, function (er, tmpname) {
-//   fs.renameSync(tmpname, __dirname + '/picture.jpg');
-// });
+    //--- take and save a picture
+    //   camera.takePicture({
+    //   targetPath: '/tmp/foo.XXXXXX'
+    // }, function (er, tmpname) {
+    //   fs.renameSync(tmpname, __dirname + '/picture.jpg');
+    // });
 
-});
+  });
+}
 
 
 function takePhotos(){
@@ -153,14 +167,14 @@ function takePhotos(){
       if(!tmpname) cb("snap error: tmpname is undefined, camera: ".red + cam.id);
 
       //--- synchronous
-      fs.renameSync(tmpname, filePath.toString());
-      cb(er);
+      // fs.renameSync(tmpname, filePath.toString());
+      // cb(er);
 
       //--- asynchronous
-      // fs.rename(tmpname, filePath.toString(), function(_er){
-      //   if(_er) return cb(_er);
-      //   cb(er);
-      // });
+      fs.rename(tmpname, filePath.toString(), function(_er){
+        if(_er) return cb(_er);
+        cb(er);
+      });
     });
   }, function(e){
     if(e) return console.log("error taking snap: ".red + e);
