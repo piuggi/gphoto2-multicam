@@ -23,7 +23,11 @@ var Gphoto2_CP = require(__dirname+'/components/gphoto2');
 var setupComplete = false; //camera setup
 var gphoto_CP_Init = new Gphoto2_CP({},function(){
   //gphoto.tetherAll();
-  initCameras(function(){
+  initCameras(function(e){
+    if(e){
+      return console.log("camera setup failed: ".red + e);
+      //TODO: socket.emit('error', e);
+    }
     console.log("camera setup complete".green);
     setupComplete = true;
   });
@@ -71,6 +75,9 @@ server.listen(8081);
 console.log('\n--------------\nApp Running on port '.cyan+(process.env.PORT || 8080)+'\n--------------\n'.cyan);
 
 io.on('connection',function(socket){
+
+  if(!setupComplete) socket.emit('loading', null);
+
   fs.readdir(__dirname+'/images',function(err,files){
     //checkout /images for all image files, (exclude DS_Store);
     Images.findOrCreate(_.without(files, ".DS_Store"),function(err,_images){
@@ -78,7 +85,6 @@ io.on('connection',function(socket){
       return socket.emit('images',_images);
     });
   });
-  if(!setupComplete) socket.emit('loading', null);
 
   /* Socket API */
   socket.on('approve',function(data){
@@ -104,7 +110,7 @@ io.on('connection',function(socket){
   socket.on('snap',function(data){
     console.log('Snap Photo! '.green+JSON.stringify(data));
     //gphoto.takePhotos();
-    takePhotos(function(){});
+    takePhotos(function(e){});
   });
 });
 
@@ -115,7 +121,8 @@ function initCameras(_cb){
   _GPhoto.list(function (list) {
     if (list.length === 0){
       console.log(" >>> NO CAMERAS FOUND <<< ".red.inverse);
-      return;
+      //TODO: socket.emit('error', "no cameras found");
+      return _cb("no cameras found");
     }
     // var camera = list[0];
     cameras_ = list;
@@ -129,9 +136,9 @@ function initCameras(_cb){
       id++;
       cb();
     }, function(_e){
-      if(_e) console.log("camera setup error: ".red + _e);
-      takePhotos(function(){
-        _cb();
+      if(_e) return _cb(_e);
+      takePhotos(function(er){
+        _cb(er);
       });
     });
 
@@ -176,7 +183,7 @@ function takePhotos(_cb){
         });
       });
     }, function(e){
-    if(e) return console.log("error taking snap: ".red + e);
-    _cb();
+    if(e) console.log("error taking snap: ".red + e);
+    _cb(e);
   });
 }
