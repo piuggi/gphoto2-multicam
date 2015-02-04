@@ -18,7 +18,11 @@ var Images = require(__dirname+'/models/images');
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/gphoto2');
 
-// var Gphoto2 = require(__dirname+'/components/gphoto2');
+var Gphoto2_CP = require(__dirname+'/components/gphoto2');
+var gphoto_CP_Init = new Gphoto2_CP({},function(){
+  //auto tether
+  //gphoto.tetherAll();
+});
 
 if (!fs.existsSync(__dirname+'/images')) fs.mkdirSync(__dirname+'/images');
 
@@ -46,10 +50,7 @@ watchr.watch({
 });
 
 
-//var gphoto = new Gphoto2({},function(){
-  //auto tether
-  //gphoto.tetherAll();
-//});
+
 
 /* Simple Express and Socket to pass info. */
 app.use(express.static('./public'));
