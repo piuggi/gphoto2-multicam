@@ -6,6 +6,7 @@ var async = require('async');
 
 var _gphoto2 = require('gphoto2');
 var _GPhoto = new _gphoto2.GPhoto2();
+var cameras_ = [];
 
 /* Simple Express and Socket to pass info. */
 var express =require('express');
@@ -90,30 +91,13 @@ io.on('connection',function(socket){
   socket.on('snap',function(data){
     console.log('Snap Photo! '.green+JSON.stringify(data));
     //gphoto.takePhotos();
-    async.each(cameras_, function(cam, cb){
-      console.log("take picture on cam: "+JSON.stringify(cam));
-      cam.takePicture({
-        targetPath: '/tmp/foo.XXXXXX'
-      }, function (er, tmpname) {
-        var filePath =  __dirname + '/images/'+new Date().getMinutes()+"."+new Date().getSeconds()+'_cam_'+cam.id+'.jpg'
-        // fs.renameSync(tmpname, filePath.toString());
-        // cb(er);
-        if(!tmpname) cb("snap error: tmpname is undefined".red);
-        fs.rename(tmpname, filePath.toString(), function(_er){
-          if(_er) return cb(_er);
-          cb(er);
-        })
-      });
-    }, function(e){
-      if(e) return console.log("error taking snap: ".red + e);
-      console.log(">> completed snap".green);
-    });
+    takePhotos();
   });
 });
 
 
 // List cameras / assign list item to variable to use below options
-var cameras_ = [];
+
 _GPhoto.list(function (list) {
   if (list.length === 0){
     console.log(" >>> NO CAMERAS FOUND <<< ".red.inverse);
@@ -121,12 +105,24 @@ _GPhoto.list(function (list) {
   }
   // var camera = list[0];
   cameras_ = list;
-  for(var i=0; i<list.length; i++){
-    var thisCam = list[i];
-    thisCam.id=i;
-    cameras_[i] = thisCam;
-    console.log('Found Camera '.cyan+i, 'model'.gray, thisCam.model, 'on port'.gray, thisCam.port);
-  }
+  // for(var i=0; i<list.length; i++){
+  var id=0;
+  async.eachSeries(list, function(_thisCam, cb){
+    var thisCam = _thisCam;
+    thisCam.id=id;
+    cameras_[id] = thisCam;
+    console.log('Found Camera '.cyan+id, 'model'.gray, thisCam.model, 'on port'.gray, thisCam.port);
+    _thisCam.takePicture({download: true}, function (er, data) {
+      fs.writeFileSync(__dirname + '/picture-'+id.toString()+'.jpg', data);
+      id++;
+      cb(er);
+    });
+  }, function(_e){
+    if(_e) console.log("camera setup error: ".red + _e);
+    console.log("camera setup complete".green);
+  });
+
+  // }
 
 
 //--- get configuration tree of camera[0]
@@ -142,3 +138,29 @@ _GPhoto.list(function (list) {
 // });
 
 });
+
+
+function takePhotos(){
+  async.each(cameras_, function(cam, cb){
+  console.log("take picture on cam: "+JSON.stringify(cam));
+  cam.takePicture({
+    targetPath: '/tmp/foo.XXXXXX'
+    }, function (er, tmpname) {
+      var filePath =  __dirname + '/images/'+new Date().getMinutes()+"."+new Date().getSeconds()+'_cam_'+cam.id+'.jpg'
+      if(!tmpname) cb("snap error: tmpname is undefined, camera: ".red + cam.id);
+
+      //--- synchronous
+      fs.renameSync(tmpname, filePath.toString());
+      cb(er);
+
+      //--- asynchronous
+      // fs.rename(tmpname, filePath.toString(), function(_er){
+      //   if(_er) return cb(_er);
+      //   cb(er);
+      // });
+    });
+  }, function(e){
+    if(e) return console.log("error taking snap: ".red + e);
+    console.log(">> completed snap".green);
+  });
+}
