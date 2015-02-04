@@ -136,6 +136,7 @@ function initCameras(){
     }, function(_e){
       if(_e) console.log("camera setup error: ".red + _e);
       console.log("camera setup complete".green);
+      takePhotos();
     });
 
     // }
@@ -159,24 +160,24 @@ function initCameras(){
 
 function takePhotos(){
   async.each(cameras_, function(cam, cb){
-  console.log("take picture on cam: "+JSON.stringify(cam));
-  cam.takePicture({
-    targetPath: '/tmp/foo.XXXXXX'
-    }, function (er, tmpname) {
-      var filePath =  __dirname + '/images/'+new Date().getMinutes()+"."+new Date().getSeconds()+'_cam_'+cam.id+'.jpg'
-      if(!tmpname) cb("snap error: tmpname is undefined, camera: ".red + cam.id);
+    console.log("take picture on cam: "+JSON.stringify(cam));
+    cam.takePicture({
+      targetPath: '/tmp/foo.XXXXXX'
+      }, function (er, tmpname) {
+        var filePath =  __dirname + '/images/'+new Date().getMinutes()+"."+new Date().getSeconds()+'_cam_'+cam.id+'.jpg';
+        if(!tmpname) cb("snap error: tmpname is undefined, camera: ".red + cam.id);
 
-      //--- synchronous
-      // fs.renameSync(tmpname, filePath.toString());
-      // cb(er);
+        //--- synchronous
+        // fs.renameSync(tmpname, filePath.toString());
+        // cb(er);
 
-      //--- asynchronous
-      fs.rename(tmpname, filePath.toString(), function(_er){
-        if(_er) return cb(_er);
-        cb(er);
+        //--- asynchronous
+        fs.rename(tmpname, filePath.toString(), function(_er){
+          if(_er) return cb(_er);
+          cb(er);
+        });
       });
-    });
-  }, function(e){
+    }, function(e){
     if(e) return console.log("error taking snap: ".red + e);
     console.log(">> completed snap".green);
   });
