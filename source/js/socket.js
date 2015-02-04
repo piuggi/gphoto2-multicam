@@ -15,6 +15,11 @@ socket.on('images', function(images){
 });
 
 
-$('#take-photo').click(function(e){
-  socket.emit('snap',{snap: 0});
-});
+socket.on('finished', function(){
+  $('#processingDialog').modal('hide');
+  $('#loadingDialog').modal('hide');
+})
+
+socket.on('loading', function(){
+  $('#loadingDialog').modal('show');
+})
