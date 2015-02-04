@@ -96,10 +96,16 @@ io.on('connection',function(socket){
         targetPath: '/tmp/foo.XXXXXX'
       }, function (er, tmpname) {
         var filePath =  __dirname + '/images/'+new Date().getMinutes()+"."+new Date().getSeconds()+'_cam_'+cam.id+'.jpg'
-        fs.renameSync(tmpname, filePath.toString());
-        cb(er);
+        // fs.renameSync(tmpname, filePath.toString());
+        // cb(er);
+        if(!tmpname) return cb("snap error: tmpname is undefined".red);
+        fs.rename(tmpname, filePath.toString(), function(_er){
+          if(_er) return cb(_er);
+          cb(er);
+        })
       });
     }, function(e){
+      if(e) return console.log("error taking snap: ".red + e);
       console.log(">> completed snap".green);
     });
   });
