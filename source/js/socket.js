@@ -18,8 +18,8 @@ socket.on('images', function(images){
 socket.on('finished', function(){
   $('#processingDialog').modal('hide');
   $('#loadingDialog').modal('hide');
-})
+});
 
 socket.on('loading', function(){
   $('#loadingDialog').modal('show');
-})
+});
