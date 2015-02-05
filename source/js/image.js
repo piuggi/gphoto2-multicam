@@ -20,7 +20,6 @@ var ImageElement = function(image){
   this.imgHolder.appendChild(this.thumbHolder);
 
   //console.log(this);
-
   return this.imgHolder;
 };
 

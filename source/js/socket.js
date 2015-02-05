@@ -1,4 +1,4 @@
-var socket = io.connect('http://127.0.0.1:8081');
+var socket = io.connect('http://192.168.1.4:8081');
 
 socket.on('images', function(images){
   //var imgDoc = document.getElementsByClassName("image")[0];
@@ -11,15 +11,14 @@ socket.on('images', function(images){
     imagesHolder.insertBefore(new ImageElement(images[i]),imagesHolder.firstChild);
   }
   //console.log(imgDoc);
-
 });
 
 
 socket.on('finished', function(){
   $('#processingDialog').modal('hide');
   $('#loadingDialog').modal('hide');
-})
+});
 
 socket.on('loading', function(){
   $('#loadingDialog').modal('show');
-})
+});
