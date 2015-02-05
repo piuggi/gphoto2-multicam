@@ -1,5 +1,6 @@
 var socket = io.connect(window.location.hostname+':8081');
 
+
 socket.on('images', function(images){
   //var imgDoc = document.getElementsByClassName("image")[0];
   var imagesHolder = document.getElementsByClassName("images")[0];
@@ -11,7 +12,6 @@ socket.on('images', function(images){
     imagesHolder.insertBefore(new ImageElement(images[i]),imagesHolder.firstChild);
   }
   //console.log(imgDoc);
-
 });
 
 

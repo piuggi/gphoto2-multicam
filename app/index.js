@@ -1,10 +1,10 @@
 process.env.UV_THREADPOOL_SIZE = 8;
+
 var fs = require('fs');
 var gulp = require('gulp');
 var colors = require('colors');
 var _ = require('lodash');
 var async = require('async');
-
 var _gphoto2 = require('gphoto2');
 var _GPhoto = new _gphoto2.GPhoto2();
 var cameras_ = [];
@@ -15,14 +15,23 @@ var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 
+/* Image folders */
+global.RAW_IMG_FOLDER = __dirname+'/images';
+global.APPROVED_FOLDER = __dirname+'/../../approved';
+global.HEARTED_FOLDER = __dirname+'/../../hearted';
+
+if (!fs.existsSync(global.RAW_IMG_FOLDER)) fs.mkdirSync(global.RAW_IMG_FOLDER);
+if (!fs.existsSync(global.APPROVED_FOLDER)) fs.mkdirSync(global.APPROVED_FOLDER);
+if (!fs.existsSync(global.HEARTED_FOLDER)) fs.mkdirSync(global.HEARTED_FOLDER);
+
 var Images = require(__dirname+'/models/images');
+
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/gphoto2');
 
 var Gphoto2_CP = require(__dirname+'/components/gphoto2');
 var setupComplete = false; //camera setup
-var gphoto_CP_Init = new Gphoto2_CP({},function(){
-  //gphoto.tetherAll();
+var gphoto_CP_Init = new Gphoto2_CP({},function(){ //gphoto.tetherAll();
   initCameras(function(e){
     if(e){
       return console.log("camera setup failed: ".red + e);
@@ -33,43 +42,36 @@ var gphoto_CP_Init = new Gphoto2_CP({},function(){
   });
 });
 
-if (!fs.existsSync(__dirname+'/images')) fs.mkdirSync(__dirname+'/images');
-
 /* Gulp Watcher */
 var watchr = require('watchr');
 var fileCounter = 0;
 watchr.watch({
-    path:'./app/images/',
-    listener:  function(changeType,filePath,fileCurrentStat,filePreviousStat){
-            switch(changeType){
-              case 'create':
-                console.log('File Added: '.green+filePath);
-                var img = new Images();
-                img.path = filePath.substr(filePath.lastIndexOf('/')+1);
-                img.save(function(){
-                  io.sockets.emit('images',[img]);
-                  fileCounter++;
-                  if (fileCounter == cameras_.length){
-                    fileCounter = 0;
-                    io.sockets.emit('finished', null);
-                  }
-                });
-                break;
-              default:
-                //console.log('a change event occured:',arguments);
-                console.log('changeType: '+changeType+' filePath: '+filePath);
-                break;
-            }
-        }
-
+  path:'./app/images/',
+  listener:  function(changeType,filePath,fileCurrentStat,filePreviousStat){
+    switch(changeType){
+      case 'create':
+        console.log('File Added: '.green+filePath);
+        var img = new Images();
+        img.path = filePath.substr(filePath.lastIndexOf('/')+1);
+        img.save(function(){
+          io.sockets.emit('images',[img]);
+          fileCounter++;
+          if (fileCounter == cameras_.length){
+            fileCounter = 0;
+            io.sockets.emit('finished', null);
+          }
+        });
+        break;
+      default: //console.log('a change event occured:',arguments);
+        console.log('changeType: '+changeType+' filePath: '+filePath);
+        break;
+    }
+  }
 });
-
-
-
 
 /* Simple Express and Socket to pass info. */
 app.use(express.static('./public'));
-app.use('/images',express.static(__dirname +'/images'));
+app.use('/images',express.static(global.RAW_IMG_FOLDER));
 app.listen(process.env.PORT || 8080);
 server.listen(8081);
 console.log('\n--------------\nApp Running on port '.cyan+(process.env.PORT || 8080)+'\n--------------\n'.cyan);
@@ -78,7 +80,7 @@ io.on('connection',function(socket){
 
   if(!setupComplete) socket.emit('loading', null);
 
-  fs.readdir(__dirname+'/images',function(err,files){
+  fs.readdir(global.RAW_IMG_FOLDER,function(err,files){
     //checkout /images for all image files, (exclude DS_Store);
     Images.findOrCreate(_.without(files, ".DS_Store"),function(err,_images){
       if(err) return socket.emit('error',err);
@@ -169,14 +171,11 @@ function takePhotos(_cb){
     cam.takePicture({
       targetPath: '/tmp/foo.XXXXXX'
       }, function (er, tmpname) {
-        var filePath =  __dirname + '/images/'+new Date().getMinutes()+"."+new Date().getSeconds()+'_cam_'+cam.id+'.jpg';
+        console.log("tmpname: "+tmpname);
+        var now = new Date();
+        var filePath =  global.RAW_IMG_FOLDER+'/'+now.getHours()+'.'+now.getMinutes()+'.'+now.getSeconds()+'.'+now.getMilliseconds()+'_cam_'+cam.id+'.jpg';
         if(!tmpname) cb("snap error: tmpname is undefined, camera: ".red + cam.id);
-
-        //--- synchronous
-        // fs.renameSync(tmpname, filePath.toString());
-        // cb(er);
-
-        //--- asynchronous
+        //--- asynchronous file copy
         fs.rename(tmpname, filePath.toString(), function(_er){
           if(_er) return cb(_er);
           cb(er);
