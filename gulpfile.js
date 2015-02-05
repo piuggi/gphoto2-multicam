@@ -16,7 +16,7 @@ var gulp = require('gulp'),
         autoprefix= new LessPluginAutoPrefix({browsers: ["last 2 versions"]});
 
     var bStarted = false;
-    var App={};
+    var App=false;
 
 /* gulp setup */
 gulp.task('styles',function(){
@@ -52,7 +52,7 @@ gulp.task('default',['clean'],function(){
 });
 
 gulp.task('startup',function(cb){
-  if(App.hasOwnProperty("connected")) if(App.connected) App.kill('SIGTERM');
+  if(App) App.kill('SIGTERM');
   App = require('child_process').fork('app',[]);
   App.on('close', function (code, signal) {
     console.log('Express App '+App.pid+' terminated due to receipt of signal '+signal);
