@@ -1,4 +1,4 @@
-var socket = io.connect('http://127.0.0.1:8081');
+var socket = io.connect(window.host+':8081');
 
 socket.on('images', function(images){
   //var imgDoc = document.getElementsByClassName("image")[0];
