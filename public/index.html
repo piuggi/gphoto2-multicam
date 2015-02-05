@@ -23,41 +23,40 @@
         <script src="/vendor/js/modernizr-2.6.2-respond-1.1.0.min.js"></script>
     </head>
     <body>
-        <!--[if lt IE 7]>
-            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-        <![endif]-->
+    <!--[if lt IE 7]>
+        <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
     <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
       <div class="container-fluid">
         <div class="navbar-header">
           <!-- <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button> -->
+            <span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span>
+            <span class="icon-bar"></span></button> -->
           <a class="navbar-brand" href="#">Zoom City Bank</a>
           <button type="button" class="btn btn-takephoto navbar-button navbar-right" id="take-photo">Take Photo <span class="glyphicon glyphicon-camera"></span><span class="icon-bar"></span></button>
         </div>
-
-
         <!-- <div id="navbar" class="navbar-collapse collapse">
-
         </div></.navbar-collapse -->
       </div>
     </nav>
 
-
     <div class="container">
-      <!-- Example row of columns -->
-      <div class="row images">
-      </div><!--.row-->
 
+      <!-- PAGINATION NAV -->
+      <center> <!-- yup, i'm doin it -->
+      <nav id="page-list">
+
+      </nav>
+      </center>
+
+      <!-- Example row of columns -->
+      <div class="row images"></div><!--.row-->
       <hr/>
 
-
     </div> <!-- /container -->
+
     <footer>
-      <p>&copy; 2014</p>
+      <center><p>&copy; 2014</p></center>
     </footer>
 
 
@@ -97,24 +96,22 @@
       </div>
     </div>
 
-      <script src="http://192.168.1.4:8081/socket.io/socket.io.js"></script>
 
-      <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-      <script>window.jQuery || document.write('<script src="/vendor/js/jquery-1.11.1.min.js"><\/script>')</script>
 
-      <script src="/vendor/js/bootstrap.min.js"></script>
-
-      <script src="/js/main.js"></script>
-
-      <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
-      <!--<script>
-          (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
-          function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
-          e=o.createElement(i);r=o.getElementsByTagName(i)[0];
-          e.src='//www.google-analytics.com/analytics.js';
-          r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
-          ga('create','UA-XXXXX-X');ga('send','pageview');
-      </script>-->
+    <script src="http://192.168.1.4:8081/socket.io/socket.io.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="/vendor/js/jquery-1.11.1.min.js"><\/script>')</script>
+    <script src="/vendor/js/bootstrap.min.js"></script>
+    <script src="/js/main.js"></script>
+    <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+    <!--<script>
+        (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+        function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+        e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+        e.src='//www.google-analytics.com/analytics.js';
+        r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+        ga('create','UA-XXXXX-X');ga('send','pageview');
+    </script>-->
 
     </body>
 </html>
