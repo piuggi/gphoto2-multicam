@@ -55,7 +55,8 @@ gulp.task('startup',function(cb){
   if(App.hasOwnProperty("connected")) if(App.connected) App.kill('SIGTERM');
   App = require('child_process').fork('app',[]);
   App.on('close', function (code, signal) {
-    console.log('App '+App.pid+' terminated due to receipt of signal '+signal);
+    console.log('Express App '+App.pid+' terminated due to receipt of signal '+signal);
+    App.connected = false;
   });
   cb();
 });
@@ -80,4 +81,11 @@ gulp.task('watch', function() {
   // Watch any files in public/, reload on change
   gulp.watch(['public/**']).on('change', livereload.changed);
 
+});
+
+process.on('SIGINT', function() {
+  console.log('');
+  console.log('Got Close Signal Killing App.');
+  App.kill('SIGTERM');
+  process.exit(1);
 });
