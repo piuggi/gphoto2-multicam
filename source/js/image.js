@@ -75,19 +75,10 @@ var _Button = function(image,cl,glyph,state){
         }
         break;
       default:
-
         break;
     }
   });
   this.btn.appendChild(this.span);
 
   return this.btn;
-};
-
-
-var clearHolder = function(holder){
-  while (holder.firstChild) {
-    holder.removeChild(holder.firstChild); //clear out all current images
-  }
-  return true;
 };
