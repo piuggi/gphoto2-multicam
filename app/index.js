@@ -59,7 +59,7 @@ watchr.watch({
         var img = new Images();
         img.path = filePath.substr(filePath.lastIndexOf('/')+1);
         img.save(function(){
-          io.sockets.emit('images',[img]);
+          io.sockets.emit('new-image',img);
           fileCounter++;
           if (fileCounter == cameras_.length){
             fileCounter = 0;
@@ -89,7 +89,7 @@ io.on('connection',function(socket){
     //checkout /images for all image files, (exclude DS_Store);
     Images.findOrCreate(_.without(files, ".DS_Store"),function(err,_images){
       if(err) return socket.emit('error',err);
-      return socket.emit('images',_images);
+      return socket.emit('init',_images);
     });
   });
 
