@@ -37,11 +37,9 @@ mongoose.connect('mongodb://localhost/gphoto2');
 //if mac osx prep cameras by ensuring no photo software is running or connected.
 Images.find({},'take',{sort:{take:-1}},function(err,_images){
   //grab TAKES NUMBER
-  console.log(_images);
   if(_images.length === 0) global.TAKES = 0;
   else global.TAKES = _images[0].take;
 
-  console.log('takes: '+global.TAKES)
   var killAll = exec('killall PTPCamera gphoto2',function (error, stdout, stderr) {
       var setupComplete = false; //camera setup
 

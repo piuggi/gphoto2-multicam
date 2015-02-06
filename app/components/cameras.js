@@ -40,11 +40,8 @@ function Cameras(_globals,_cb){
 
 
 function takePhotos(_cb){
-  console.log("global Takes: "+global.TAKES)
   global.TAKES++;
-
   var current_take = global.TAKES;
-  console.log("global Takes: "+global.TAKES)
   async.each(cameras_, function(cam, cb){
     console.log("take picture on cam: "+JSON.stringify(cam));
     cam.takePicture({
