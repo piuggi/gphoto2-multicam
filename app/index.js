@@ -34,6 +34,9 @@ var Images = require(__dirname+'/models/images');
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/gphoto2');
 
+var setupComplete = false; //camera setup
+
+
 //if mac osx prep cameras by ensuring no photo software is running or connected.
 Images.find({},'take',{sort:{take:-1}},function(err,_images){
   //grab TAKES NUMBER
@@ -41,7 +44,6 @@ Images.find({},'take',{sort:{take:-1}},function(err,_images){
   else global.TAKES = _images[0].take;
 
   var killAll = exec('killall PTPCamera gphoto2',function (error, stdout, stderr) {
-      var setupComplete = false; //camera setup
 
       cameras = Cameras(global,function(e){
         if(e){
