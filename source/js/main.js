@@ -1,15 +1,13 @@
 
-
+/* session vars */
 var pageSize = 3; //how many images per page to show
+var totalPages;
 var currentPage;
-var allImages = []; //will hold all images for this 'session'
+var allImages = [];
 
 $(document).ready(function(){
-
-  console.log("pageSize: "+pageSize + " imgs");
-
+  console.log("pageSize: "+pageSize + " imgs per page");
   $('#take-photo').click(function(e){
-    // processingModal.show();
     $('#processingDialog').modal('show');
     socket.emit('snap',{snap: 0});
   });
@@ -19,13 +17,11 @@ $(document).ready(function(){
 var Pagination = function(numPages){
   this.pagination = document.createElement("ul");
   this.pagination.className = "pagination pagination-lg";
-  /***** NEXT + PREVIOUS BUTTONS *****/
-  // this.previous = document.createElement("li");
-  // this.previous.insertAdjacentHTML('afterbegin', '<a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>');
-  // this.pagination.appendChild(this.previous);
-  // this.next = document.createElement("li");
-  // this.next.insertAdjacentHTML('afterbegin', '<a href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>');
-  // this.pagination.appendChild(this.next);
+
+  this.previous = document.createElement("li");
+  this.previous.insertAdjacentHTML('afterbegin', '<a href="#" class="prev-page" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>');
+  this.pagination.appendChild(this.previous);
+
 
   for(var i=0; i<numPages; i++){
     this.page = document.createElement("li");
@@ -44,22 +40,38 @@ var Pagination = function(numPages){
   function attachPageLinkListener(_pageLink, pageNum){
     _pageLink.addEventListener("click",function(e){
       console.log("page click: "+pageNum);
-      currentPage = pageNum;
-      goToPage(currentPage);
-      // $("a.pagenum").parent().removeClass("active");
-      // $("a.pagenum[value='"+currentPage+"']").parent().addClass("active");
-      // var imgIdx = (currentPage*pageSize);
-      // loadImages(imgIdx);
+      goToPage(pageNum);
     });
   }
+
+  this.next = document.createElement("li");
+  this.next.insertAdjacentHTML('afterbegin', '<a href="#" class="next-page" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>');
+  this.pagination.appendChild(this.next);
+
+  this.previous.addEventListener("click", function(e){
+    if(currentPage>0) goToPage(currentPage-1);
+  });
+  this.next.addEventListener("click", function(e){
+    if(currentPage<totalPages-1) goToPage(currentPage+1);
+  });
+
   return this.pagination;
 };
 
-var goToPage = function(pageNum){
-  $("a.pagenum").parent().removeClass("active");
-  $("a.pagenum[value='"+currentPage+"']").parent().addClass("active");
+
+
+var setupPages = function(cb){
+  totalPages = Math.ceil(allImages.length / pageSize);
+
+  var navPageList = document.getElementById("page-list");
+  navPageList.removeChild(navPageList.firstChild); //get rid of entire <ul>
+  navPageList.appendChild(new Pagination(totalPages));
+
+  currentPage = totalPages-1;
   var imgIdx = (currentPage*pageSize);
-  loadImages(imgIdx);
+  $("a.pagenum[value='"+currentPage+"']").parent().addClass("active");
+
+  cb(imgIdx);
 };
 
 
@@ -69,15 +81,22 @@ var loadImages = function(idx){
   clearHolder(imagesHolder);
 
   for(var j=idx; j<idx+pageSize; j++){
-  // for(var j=endIdx-pageSize; j<endIdx; j++){ //imgClone.getElementsByTagName('img')[0].src = 'images/'+images[i].path;
     if(j < allImages.length){ //partial page (if last page has less than full pageSize)
       console.log('allImages['+j+']');
       var thisImage = new ImageElement(allImages[j]);
-      // imagesHolder.appendChild(thisImage);
       imagesHolder.insertBefore(thisImage, imagesHolder.firstChild);
     }
   }
-}
+};
+
+
+var goToPage = function(pageNum){
+  $("a.pagenum").parent().removeClass("active");
+  $("a.pagenum[value='"+pageNum+"']").parent().addClass("active");
+  var imgIdx = (pageNum*pageSize);
+  loadImages(imgIdx);
+  currentPage = pageNum;
+};
 
 
 var clearHolder = function(holder){
