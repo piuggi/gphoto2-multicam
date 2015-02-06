@@ -7,7 +7,6 @@ var fs = require('fs');
 var _gphoto2 = require('gphoto2');
 var _GPhoto = new _gphoto2.GPhoto2();
 
-
 function Cameras(_globals,_cb){
   // List cameras / assign list item to variable to use below options
   global = _globals;//just in case I misunderstood.
@@ -41,6 +40,11 @@ function Cameras(_globals,_cb){
 
 
 function takePhotos(_cb){
+  console.log("global Takes: "+global.TAKES)
+  global.TAKES++;
+
+  var current_take = global.TAKES;
+  console.log("global Takes: "+global.TAKES)
   async.each(cameras_, function(cam, cb){
     console.log("take picture on cam: "+JSON.stringify(cam));
     cam.takePicture({
@@ -48,7 +52,8 @@ function takePhotos(_cb){
       }, function (er, tmpname) {
         console.log("tmpname: "+tmpname);
         var now = new Date();
-        var filePath =  global.RAW_IMG_FOLDER+'/'+now.getHours()+'.'+now.getMinutes()+'.'+now.getSeconds()+'.'+now.getMilliseconds()+'_cam_'+cam.id+'.jpg';
+        //var filePath =  global.RAW_IMG_FOLDER+'/'+now.getHours()+'.'+now.getMinutes()+'.'+now.getSeconds()+'.'+now.getMilliseconds()+'_cam_'+cam.id+'.jpg';
+        var filePath = global.RAW_IMG_FOLDER+'/'+current_take+'_'+cam.id+'_'+(now.getMonth() + 1) + '' + now.getDate() + '' +  now.getFullYear() +'.'+now.getHours()+'.'+now.getMinutes()+'.'+now.getSeconds()+'.'+now.getMilliseconds()+'.jpg';
         if(!tmpname) cb("snap error: tmpname is undefined, camera: ".red + cam.id);
         //--- asynchronous file copy
         fs.rename(tmpname, filePath.toString(), function(_er){

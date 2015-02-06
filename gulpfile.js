@@ -84,8 +84,8 @@ gulp.task('watch', function() {
 });
 
 process.on('SIGINT', function() {
+  App.kill('SIGTERM');
   console.log('');
   console.log('Got Close Signal Killing App.');
-  App.kill('SIGTERM');
   process.exit(1);
 });

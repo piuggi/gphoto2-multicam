@@ -7,7 +7,9 @@ var Images = mongoose.Schema({
 
   path: String,
   approved: { type: Boolean, default: false },
-  hearted: { type: Boolean, default: false }
+  hearted: { type: Boolean, default: false },
+  take: Number,
+  camera: Number
 });
 
 Images.methods.approve = function(cb){

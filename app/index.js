@@ -22,6 +22,8 @@ var cameras;
 global.RAW_IMG_FOLDER = __dirname+'/images';
 global.APPROVED_FOLDER = '/Volumes/c/'; //__dirname+'/../../approved';
 global.HEARTED_FOLDER = '/Volumes/c/'; //__dirname+'/../../hearted';
+global.TAKES = 0;
+
 
 if (!fs.existsSync(global.RAW_IMG_FOLDER)) fs.mkdirSync(global.RAW_IMG_FOLDER);
 if (!fs.existsSync(global.APPROVED_FOLDER)) fs.mkdirSync(global.APPROVED_FOLDER);
@@ -33,18 +35,25 @@ var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/gphoto2');
 
 //if mac osx prep cameras by ensuring no photo software is running or connected.
-//
-var killAll = exec('killall PTPCamera gphoto2',function (error, stdout, stderr) {
-    var setupComplete = false; //camera setup
+Images.find({},'take',{sort:{take:-1}},function(err,_images){
+  //grab TAKES NUMBER
+  console.log(_images);
+  if(_images.length === 0) global.TAKES = 0;
+  else global.TAKES = _images[0].take;
 
-    cameras = Cameras(global,function(e){
-      if(e){
-        return console.log("camera setup failed: ".red + e);
-        //TODO: socket.emit('error', e);
-      }
-      console.log("camera setup complete".green);
-      setupComplete = true;
-    });
+  console.log('takes: '+global.TAKES)
+  var killAll = exec('killall PTPCamera gphoto2',function (error, stdout, stderr) {
+      var setupComplete = false; //camera setup
+
+      cameras = Cameras(global,function(e){
+        if(e){
+          return console.log("camera setup failed: ".red + e);
+          //TODO: socket.emit('error', e);
+        }
+        console.log("camera setup complete".green);
+        setupComplete = true;
+      });
+  });
 });
 
 /* Gulp Watcher */
@@ -58,7 +67,10 @@ watchr.watch({
         console.log('File Added: '.green+filePath);
         var img = new Images();
         img.path = filePath.substr(filePath.lastIndexOf('/')+1);
+        img.take = filePath.substr(filePath.lastIndexOf('/')+1,1);
+        img.camera = filePath.substr(filePath.indexOf('_')+1,1);
         img.save(function(){
+
           io.sockets.emit('new-image',img);
           fileCounter++;
           if (fileCounter == cameras_.length){
