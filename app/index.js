@@ -5,8 +5,7 @@ var gulp = require('gulp');
 var colors = require('colors');
 var _ = require('lodash');
 var async = require('async');
-var _gphoto2 = require('gphoto2');
-var _GPhoto = new _gphoto2.GPhoto2();
+
 var cameras_ = [];
 
 /* Simple Express and Socket to pass info. */
@@ -14,11 +13,15 @@ var express =require('express');
 var app = express();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
+var exec = require('child_process').exec;
+
+var Cameras = require('./components/cameras.js');
+var cameras;
 
 /* Image folders */
 global.RAW_IMG_FOLDER = __dirname+'/images';
-global.APPROVED_FOLDER = __dirname+'/../../approved';
-global.HEARTED_FOLDER = __dirname+'/../../hearted';
+global.APPROVED_FOLDER = '/Volumes/c/'; //__dirname+'/../../approved';
+global.HEARTED_FOLDER = '/Volumes/c/'; //__dirname+'/../../hearted';
 
 if (!fs.existsSync(global.RAW_IMG_FOLDER)) fs.mkdirSync(global.RAW_IMG_FOLDER);
 if (!fs.existsSync(global.APPROVED_FOLDER)) fs.mkdirSync(global.APPROVED_FOLDER);
@@ -29,17 +32,19 @@ var Images = require(__dirname+'/models/images');
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/gphoto2');
 
-var Gphoto2_CP = require(__dirname+'/components/gphoto2');
-var setupComplete = false; //camera setup
-var gphoto_CP_Init = new Gphoto2_CP({},function(){ //gphoto.tetherAll();
-  initCameras(function(e){
-    if(e){
-      return console.log("camera setup failed: ".red + e);
-      //TODO: socket.emit('error', e);
-    }
-    console.log("camera setup complete".green);
-    setupComplete = true;
-  });
+//if mac osx prep cameras by ensuring no photo software is running or connected.
+//
+var killAll = exec('killall PTPCamera gphoto2',function (error, stdout, stderr) {
+    var setupComplete = false; //camera setup
+
+    cameras = Cameras(global,function(e){
+      if(e){
+        return console.log("camera setup failed: ".red + e);
+        //TODO: socket.emit('error', e);
+      }
+      console.log("camera setup complete".green);
+      setupComplete = true;
+    });
 });
 
 /* Gulp Watcher */
@@ -112,77 +117,6 @@ io.on('connection',function(socket){
   socket.on('snap',function(data){
     console.log('Snap Photo! '.green+JSON.stringify(data));
     //gphoto.takePhotos();
-    takePhotos(function(e){});
+    cameras.takePhotos(function(e){});
   });
 });
-
-
-function initCameras(_cb){
-  // List cameras / assign list item to variable to use below options
-
-  _GPhoto.list(function (list) {
-    if (list.length === 0){
-      console.log(" >>> NO CAMERAS FOUND <<< ".red.inverse);
-      //TODO: socket.emit('error', "no cameras found");
-      return _cb("no cameras found");
-    }
-    // var camera = list[0];
-    cameras_ = list;
-
-    var id=0;
-    async.eachSeries(list, function(_thisCam, cb){
-      var thisCam = _thisCam;
-      thisCam.id=id;
-      cameras_[id] = thisCam;
-      console.log('Found Camera '.cyan+id, 'model'.gray, thisCam.model, 'on port'.gray, thisCam.port);
-      id++;
-      cb();
-    }, function(_e){
-      if(_e) return _cb(_e);
-      takePhotos(function(er){
-        _cb(er);
-      });
-    });
-
-    //--- get configuration tree of camera[0]
-    //camera.getConfig(function (er, settings) {
-    //console.log(settings);
-    //});
-
-    //--- take and save a picture
-    //   camera.takePicture({
-    //   targetPath: '/tmp/foo.XXXXXX'
-    // }, function (er, tmpname) {
-    //   fs.renameSync(tmpname, __dirname + '/picture.jpg');
-    // });
-
-    //--- another take and save a picture
-    // _thisCam.takePicture({download: true}, function (er, data) {
-    //   fs.writeFileSync(__dirname + '/picture-'+id.toString()+'.jpg', data);
-    // });
-
-  });
-}
-
-
-function takePhotos(_cb){
-  async.each(cameras_, function(cam, cb){
-    console.log("take picture on cam: "+JSON.stringify(cam));
-    cam.takePicture({
-      targetPath: '/tmp/foo.XXXXXX'
-      }, function (er, tmpname) {
-        console.log("tmpname: "+tmpname);
-        var now = new Date();
-        var filePath =  global.RAW_IMG_FOLDER+'/'+now.getHours()+'.'+now.getMinutes()+'.'+now.getSeconds()+'.'+now.getMilliseconds()+'_cam_'+cam.id+'.jpg';
-        if(!tmpname) cb("snap error: tmpname is undefined, camera: ".red + cam.id);
-        //--- asynchronous file copy
-        fs.rename(tmpname, filePath.toString(), function(_er){
-          if(_er) return cb(_er);
-          cb(er);
-        });
-      });
-    }, function(e){
-    if(e) console.log("error taking snap: ".red + e);
-    _cb(e);
-  });
-}
