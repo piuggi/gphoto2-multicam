@@ -1,62 +1,107 @@
 
+/* session vars */
+var pageSize = 3; //how many images per page to show
+var totalPages;
+var currentPage;
+var allImages = [];
 
 $(document).ready(function(){
-
-
-});
-
-function initClickListeners(){
-
+  console.log("pageSize: "+pageSize + " imgs per page");
   $('#take-photo').click(function(e){
-    // processingModal.show();
     $('#processingDialog').modal('show');
     socket.emit('snap',{snap: 0});
   });
-
-  $(".pagenum").click(function(id){
-    //this doesn't work... need to get value or just text from $(this) clicked.
-    var p = $(this).val();
-    console.log("page click: "+p);
-
-    var endImgIdx = p*pageSize;
-
-    var imagesHolder = document.getElementsByClassName("images")[0];
-    clearHolder(imagesHolder);
-
-    for(var j=endImgIdx+pageSize; j>=endImgIdx; j--){ //imgClone.getElementsByTagName('img')[0].src = 'images/'+images[i].path;
-      var thisImage = new ImageElement(allImages[j]);
-      imagesHolder.insertBefore(thisImage,imagesHolder.firstChild);
-    }
-  });
-}
+});
 
 
 var Pagination = function(numPages){
-
   this.pagination = document.createElement("ul");
-  this.pagination.className = "pagination";
+  this.pagination.className = "pagination pagination-lg";
 
   this.previous = document.createElement("li");
-  this.previous.insertAdjacentHTML('afterbegin', '<a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>');
-
+  this.previous.insertAdjacentHTML('afterbegin', '<a href="#" class="prev-page" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>');
   this.pagination.appendChild(this.previous);
 
-  for(var i=1; i<=numPages; i++){
+
+  for(var i=0; i<numPages; i++){
     this.page = document.createElement("li");
     this.pageLink = document.createElement("a");
     this.pageLink.className = "pagenum";
     this.pageLink.setAttribute("value", i);
 
+    attachPageLinkListener(this.pageLink, i);
+
     this.pageNumber = document.createTextNode(i);
     this.pageLink.appendChild(this.pageNumber);
     this.page.appendChild(this.pageLink);
-
     this.pagination.appendChild(this.page);
   }
 
+  function attachPageLinkListener(_pageLink, pageNum){
+    _pageLink.addEventListener("click",function(e){
+      console.log("page click: "+pageNum);
+      goToPage(pageNum);
+    });
+  }
+
   this.next = document.createElement("li");
-  this.next.insertAdjacentHTML('afterbegin', '<a href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>');
+  this.next.insertAdjacentHTML('afterbegin', '<a href="#" class="next-page" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>');
   this.pagination.appendChild(this.next);
 
+  this.previous.addEventListener("click", function(e){
+    if(currentPage>0) goToPage(currentPage-1);
+  });
+  this.next.addEventListener("click", function(e){
+    if(currentPage<totalPages-1) goToPage(currentPage+1);
+  });
+
   return this.pagination;
+};
+
+
+
+var setupPages = function(cb){
+  totalPages = Math.ceil(allImages.length / pageSize);
+
+  var navPageList = document.getElementById("page-list");
+  navPageList.removeChild(navPageList.firstChild); //get rid of entire <ul>
+  navPageList.appendChild(new Pagination(totalPages));
+
+  currentPage = totalPages-1;
+  var imgIdx = (currentPage*pageSize);
+  $("a.pagenum[value='"+currentPage+"']").parent().addClass("active");
+
+  cb(imgIdx);
+};
+
+
+var loadImages = function(idx){
+  console.log("loadImages, idx: "+idx);
+  var imagesHolder = document.getElementsByClassName("images")[0];
+  clearHolder(imagesHolder);
+
+  for(var j=idx; j<idx+pageSize; j++){
+    if(j < allImages.length){ //partial page (if last page has less than full pageSize)
+      console.log('allImages['+j+']');
+      var thisImage = new ImageElement(allImages[j]);
+      imagesHolder.insertBefore(thisImage, imagesHolder.firstChild);
+    }
+  }
+};
+
+
+var goToPage = function(pageNum){
+  $("a.pagenum").parent().removeClass("active");
+  $("a.pagenum[value='"+pageNum+"']").parent().addClass("active");
+  var imgIdx = (pageNum*pageSize);
+  loadImages(imgIdx);
+  currentPage = pageNum;
+};
+
+
+var clearHolder = function(holder){
+  while (holder.firstChild) {
+    holder.removeChild(holder.firstChild); //clear out all current images
+  }
+  return true;
 };
