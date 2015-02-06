@@ -1,4 +1,5 @@
-var socket = io.connect('http://192.168.1.4:8081');
+var socket = io.connect(window.location.hostname+':8081');
+
 
 var pageSize = 5; //how many images per page to show
 

@@ -96,22 +96,30 @@
       </div>
     </div>
 
+    <div id="output"></div>
 
+    <script>
+    var s = document.createElement("script");
+                s.type = "text/javascript";
+                s.src = "http://"+window.location.hostname+":8081/socket.io/socket.io.js";
+                s.innerHTML = null;
+                document.getElementById("output").innerHTML = "";
+                document.getElementById("output").appendChild(s);
+      </script>
 
-    <script src="http://192.168.1.4:8081/socket.io/socket.io.js"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-    <script>window.jQuery || document.write('<script src="/vendor/js/jquery-1.11.1.min.js"><\/script>')</script>
-    <script src="/vendor/js/bootstrap.min.js"></script>
-    <script src="/js/main.js"></script>
-    <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
-    <!--<script>
-        (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
-        function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
-        e=o.createElement(i);r=o.getElementsByTagName(i)[0];
-        e.src='//www.google-analytics.com/analytics.js';
-        r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
-        ga('create','UA-XXXXX-X');ga('send','pageview');
-    </script>-->
-
+      <script src="http://192.168.1.4:8081/socket.io/socket.io.js"></script>
+      <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+      <script>window.jQuery || document.write('<script src="/vendor/js/jquery-1.11.1.min.js"><\/script>')</script>
+      <script src="/vendor/js/bootstrap.min.js"></script>
+      <script src="/js/main.js"></script>
+      <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+      <!--<script>
+          (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+          function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+          e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+          e.src='//www.google-analytics.com/analytics.js';
+          r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+          ga('create','UA-XXXXX-X');ga('send','pageview');
+      </script>-->
     </body>
 </html>
