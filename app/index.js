@@ -120,6 +120,7 @@ var setupSockets = function(){
             Images.findById(data._id,function(err,image){
               image.approve(function(err,_img){
                 //TODO Add socket emit to update all connections.
+                socket.broadcast.emit('approved',image);
                 console.log('Approved.');
               });
             });
@@ -130,6 +131,7 @@ var setupSockets = function(){
             Images.findById(data._id,function(err,image){
               image.heart(function(err,_img){
                 //TODO Add socket emit to update all connections.
+                socket.broadcast.emit('hearted',image);
                 console.log('Hearted.');
               });
             });

@@ -11,6 +11,22 @@ socket.on('init', function(images){
   });
 });
 
+socket.on('approved', function(image){
+  console.log('approved: \n %s',JSON.stringify(image));
+  var imageElm = document.getElementsByClassName(image._id)[0];
+  console.log(imageElm);
+  var button = imageElm.getElementsByClassName('approve')[0];
+  button.className = "btn btn-primary approve disabled";
+  console.log(button.className);
+});
+
+socket.on('hearted', function(image){
+  console.log('approved: \n %s',JSON.stringify(image));
+  var imageElm = document.getElementsByClassName(image._id)[0];
+  console.log(imageElm);
+  var button = imageElm.getElementsByClassName('heart')[0];
+  button.className = "btn btn-danger heart disabled";
+});
 
 socket.on('new-image', function(image){
 

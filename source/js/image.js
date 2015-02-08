@@ -1,7 +1,7 @@
 var ImageElement = function(image){
   // console.log("IMAGE : "+JSON.stringify(image,null,'\t'));
   this.imgHolder = document.createElement("div");
-  this.imgHolder.className = "image col-xs-6 col-md-3 col-lg-4";
+  this.imgHolder.className = "image col-xs-6 col-md-3 col-lg-4 "+image._id;
 
   this.thumbHolder = document.createElement("div");
   this.thumbHolder.className = "thumbnail";
@@ -67,7 +67,7 @@ var _Button = function(image,cl,glyph,state){
     switch(cl){
       case 'approve':
       case 'heart':
-        console.log('here');
+        //console.log('here');
         if(!state){
           socket.emit(cl,{_id: image._id});
           if(cl == 'approve') _this.btn.className = "btn btn-primary "+cl+" disabled";
