@@ -12,6 +12,13 @@ var Images = mongoose.Schema({
   camera: Number
 });
 
+Images.pre('save',function(next){
+
+  this.take = this.path.substr(0,1);
+  this.camera = this.path.substr(this.path.indexOf('_')+1,1);
+  next();
+});
+
 Images.methods.approve = function(cb){
   var self = this;
   self.approved = !self.approved;
