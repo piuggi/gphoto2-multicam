@@ -13,10 +13,11 @@ socket.on('init', function(images){
 
 
 socket.on('new-image', function(image){
+
   console.log("socket.on: new-image");
   allImages.push(image);
-  console.log("allImages length: "+allImages.length);
 
+  console.log("allImages length: "+allImages.length);
   setupPages(function(imgIdx){
     loadImages(imgIdx);
   });

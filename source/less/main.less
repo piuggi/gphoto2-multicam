@@ -13,6 +13,10 @@ html{
   }
 }
 
+.inverse{
+  background: #000;
+  color: #fff;
+}
 .image-path{
   float: right;
   padding: 11px 11px;
@@ -21,10 +25,37 @@ html{
   /*margin-left: 50px;*/
 }
 
+#navbar {
+  padding: 15px 40px;
+  position: relative;
+}
+
+.navbar-header{
+  position: absolute;
+  top: 15%;
+  margin: 0; padding: 0;
+}
+
 .btn-takephoto {
   font-size:350%;
-  float:right;
-  margin: 10px 10px 10px 10px;
+  margin-right: 20px;
+  //float:right;
+}
+
+.btn.inverse{
+  border: 1px solid #fff;
+}
+
+.btn.inverse:hover{
+  color: #fff;
+}
+
+a.navbar-brand{
+  width: 280px;
+  height: 78px;
+  background: url('/imgs/zoomcitylogo.png');
+  text-indent: -9999px;
+  overflow:none;
 }
 
 .container {

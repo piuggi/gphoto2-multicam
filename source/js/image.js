@@ -40,7 +40,7 @@ var _ButtonToolbar = function(image){
   this.imagePath = document.createTextNode(image.path);
   this.imgLabel = document.createElement("p");
   this.imgLabel.appendChild(this.imagePath);
-  this.imgLabel.className = "label label-info image-path";
+  this.imgLabel.className = "label inverse image-path";
 
   this.btntoolbar.appendChild(this.btngroup);
   this.btngroup.appendChild(this.imgLabel);
