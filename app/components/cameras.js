@@ -7,9 +7,11 @@ var fs = require('fs');
 var _gphoto2 = require('gphoto2');
 var _GPhoto = new _gphoto2.GPhoto2();
 
-function Cameras(_globals,_cb){
+function Cameras(_cb){
   // List cameras / assign list item to variable to use below options
-  global = _globals;//just in case I misunderstood.
+  //global = _globals;//just in case I misunderstood.
+  var self = this;
+  this.cameras_;
 
   _GPhoto.list(function (list) {
     if (list.length === 0){
@@ -18,13 +20,13 @@ function Cameras(_globals,_cb){
       return _cb("no cameras found");
     }
     // var camera = list[0];
-    cameras_ = list;
+    self.cameras_ = list;
 
     var id=0;
     async.eachSeries(list, function(_thisCam, cb){
       var thisCam = _thisCam;
       thisCam.id=id;
-      cameras_[id] = thisCam;
+      self.cameras_[id] = thisCam;
       console.log('Found Camera '.cyan+id, 'model'.gray, thisCam.model, 'on port'.gray, thisCam.port);
       id++;
       cb();
@@ -36,10 +38,11 @@ function Cameras(_globals,_cb){
     });
 
   });
+  return self;
 }
 
 
-function takePhotos(_cb){
+Cameras.prototype.takePhotos = takePhotos =  function(_cb){
   global.TAKES++;
   var current_take = global.TAKES;
   async.each(cameras_, function(cam, cb){
@@ -62,8 +65,6 @@ function takePhotos(_cb){
     if(e) console.log("error taking snap: ".red + e);
     _cb(e);
   });
-}
-
-Cameras.prototype.takePhotos = takePhotos;
+};
 
 module.exports = Cameras;

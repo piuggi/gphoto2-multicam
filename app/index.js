@@ -6,7 +6,7 @@ var colors = require('colors');
 var _ = require('lodash');
 var async = require('async');
 
-var cameras_ = [];
+//var cameras_ = [];
 
 /* Simple Express and Socket to pass info. */
 var express =require('express');
@@ -16,7 +16,8 @@ var io = require('socket.io')(server);
 var exec = require('child_process').exec;
 
 var Cameras = require('./components/cameras.js');
-var cameras;
+
+var cameras = 'test';
 
 /* Image folders */
 global.RAW_IMG_FOLDER = __dirname+'/images';
@@ -45,14 +46,21 @@ Images.find({},'take',{sort:{take:-1}},function(err,_images){
 
   var killAll = exec('killall PTPCamera gphoto2',function (error, stdout, stderr) {
 
-      cameras = Cameras(global,function(e){
+      cameras = Cameras(function(e){
         if(e){
           return console.log("camera setup failed: ".red + e);
           //TODO: socket.emit('error', e);
         }
         console.log("camera setup complete".green);
         setupComplete = true;
+        //setup the websockets with our camera data.
+        //start socket.io server now as well.
+        setupSockets();
+        server.listen(8081);
+
       });
+
+
   });
 });
 
@@ -67,13 +75,11 @@ watchr.watch({
         console.log('File Added: '.green+filePath);
         var img = new Images();
         img.path = filePath.substr(filePath.lastIndexOf('/')+1);
-        img.take = filePath.substr(filePath.lastIndexOf('/')+1,1);
-        img.camera = filePath.substr(filePath.indexOf('_')+1,1);
         img.save(function(){
 
           io.sockets.emit('new-image',img);
           fileCounter++;
-          if (fileCounter == cameras_.length){
+          if (fileCounter == cameras.cameras_.length){
             fileCounter = 0;
             io.sockets.emit('finished', null);
           }
@@ -90,45 +96,48 @@ watchr.watch({
 app.use(express.static('./public'));
 app.use('/images',express.static(global.RAW_IMG_FOLDER));
 app.listen(process.env.PORT || 8080);
-server.listen(8081);
+// server.listen(8081); //moving for test.
 console.log('\n--------------\nApp Running on port '.cyan+(process.env.PORT || 8080)+'\n--------------\n'.cyan);
 
-io.on('connection',function(socket){
+var setupSockets = function(){
+  //console.log(cameras);
+  io.on('connection', function(socket){
 
-  if(!setupComplete) socket.emit('loading', null);
+          console.log('socket connection created.'.yellow);
+          if(!setupComplete) socket.emit('loading', null);
 
-  fs.readdir(global.RAW_IMG_FOLDER,function(err,files){
-    //checkout /images for all image files, (exclude DS_Store);
-    Images.findOrCreate(_.without(files, ".DS_Store"),function(err,_images){
-      if(err) return socket.emit('error',err);
-      return socket.emit('init',_images);
-    });
-  });
+          fs.readdir(global.RAW_IMG_FOLDER,function(err,files){
+            //checkout /images for all image files, (exclude DS_Store);
+            Images.findOrCreate(_.without(files, ".DS_Store"),function(err,_images){
+              if(err) return socket.emit('error',err);
+              return socket.emit('init',_images);
+            });
+          });
 
-  /* Socket API */
-  socket.on('approve',function(data){
-    console.log('Approve: '+JSON.stringify(data));
-    Images.findById(data._id,function(err,image){
-      image.approve(function(err,_img){
-        //TODO Add socket emit to update all connections.
-        console.log('Approved.');
+          /* Socket API */
+          socket.on('approve',function(data){
+            console.log('Approve: '+JSON.stringify(data));
+            Images.findById(data._id,function(err,image){
+              image.approve(function(err,_img){
+                //TODO Add socket emit to update all connections.
+                console.log('Approved.');
+              });
+            });
+          });
+
+          socket.on('heart',function(data){
+            console.log('Heart: '+JSON.stringify(data));
+            Images.findById(data._id,function(err,image){
+              image.heart(function(err,_img){
+                //TODO Add socket emit to update all connections.
+                console.log('Hearted.');
+              });
+            });
+          });
+
+          socket.on('snap',function(data){
+            console.log('Snap Photo! '.green+JSON.stringify(data));
+            cameras.takePhotos(function(e){});
+          });
       });
-    });
-  });
-
-  socket.on('heart',function(data){
-    console.log('Heart: '+JSON.stringify(data));
-    Images.findById(data._id,function(err,image){
-      image.heart(function(err,_img){
-        //TODO Add socket emit to update all connections.
-        console.log('Hearted.');
-      });
-    });
-  });
-
-  socket.on('snap',function(data){
-    console.log('Snap Photo! '.green+JSON.stringify(data));
-    //gphoto.takePhotos();
-    cameras.takePhotos(function(e){});
-  });
-});
+};
