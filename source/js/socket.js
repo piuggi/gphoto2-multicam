@@ -7,7 +7,9 @@ socket.on('init', function(images){
   console.log("allImages length: "+allImages.length);
 
   setupPages(function(imgIdx){
-    loadImages(imgIdx);
+    loadImages(imgIdx, function(){
+
+    });
   });
 });
 
@@ -34,15 +36,20 @@ socket.on('new-image', function(image){
   allImages.push(image);
 
   console.log("allImages length: "+allImages.length);
-  setupPages(function(imgIdx){
-    loadImages(imgIdx);
-  });
+  // setupPages(function(imgIdx){
+  //   loadImages(imgIdx);
+  // });
 });
 
 
 socket.on('finished', function(){
-  $('#processingDialog').modal('hide');
-  $('#loadingDialog').modal('hide');
+  //location.reload();
+  setupPages(function(imgIdx){
+    loadImages(imgIdx, function(){
+      $('#processingDialog').modal('hide');
+      $('#loadingDialog').modal('hide');
+    });
+  });
 });
 
 

@@ -21,12 +21,14 @@ var cameras = 'test';
 
 /* Image folders */
 global.RAW_IMG_FOLDER = __dirname+'/images';
+global.SCALED_IMG_FOLDER = __dirname+'/scaled-images';
 global.APPROVED_FOLDER = '/Volumes/c/'; //__dirname+'/../../approved';
 global.HEARTED_FOLDER = '/Volumes/c/'; //__dirname+'/../../hearted';
 global.TAKES = 0;
 
 
 if (!fs.existsSync(global.RAW_IMG_FOLDER)) fs.mkdirSync(global.RAW_IMG_FOLDER);
+if (!fs.existsSync(global.SCALED_IMG_FOLDER)) fs.mkdirSync(global.SCALED_IMG_FOLDER);
 if (!fs.existsSync(global.APPROVED_FOLDER)) fs.mkdirSync(global.APPROVED_FOLDER);
 if (!fs.existsSync(global.HEARTED_FOLDER)) fs.mkdirSync(global.HEARTED_FOLDER);
 
@@ -76,13 +78,14 @@ watchr.watch({
         var img = new Images();
         img.path = filePath.substr(filePath.lastIndexOf('/')+1);
         img.save(function(){
-
-          io.sockets.emit('new-image',img);
-          fileCounter++;
-          if (fileCounter == cameras.cameras_.length){
-            fileCounter = 0;
-            io.sockets.emit('finished', null);
-          }
+          img.copyFile('scale',function(e){
+            io.sockets.emit('new-image',img);
+            fileCounter++;
+            if (fileCounter == cameras.cameras_.length){
+              fileCounter = 0;
+              io.sockets.emit('finished', null);
+            }
+          });
         });
         break;
       default: //console.log('a change event occured:',arguments);
@@ -95,6 +98,8 @@ watchr.watch({
 /* Simple Express and Socket to pass info. */
 app.use(express.static('./public'));
 app.use('/images',express.static(global.RAW_IMG_FOLDER));
+app.use('/scaled-images',express.static(global.SCALED_IMG_FOLDER));
+
 app.listen(process.env.PORT || 8080);
 // server.listen(8081); //moving for test.
 console.log('\n--------------\nApp Running on port '.cyan+(process.env.PORT || 8080)+'\n--------------\n'.cyan);
@@ -106,7 +111,8 @@ var setupSockets = function(){
           console.log('socket connection created.'.yellow);
           if(!setupComplete) socket.emit('loading', null);
 
-          fs.readdir(global.RAW_IMG_FOLDER,function(err,files){
+          // fs.readdir(global.RAW_IMG_FOLDER,function(err,files){
+          fs.readdir(global.SCALED_IMG_FOLDER,function(err,files){
             //checkout /images for all image files, (exclude DS_Store);
             Images.findOrCreate(_.without(files, ".DS_Store"),function(err,_images){
               if(err) return socket.emit('error',err);

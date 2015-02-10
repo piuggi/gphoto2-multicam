@@ -1,6 +1,6 @@
 
 /* session vars */
-var pageSize = 3; //how many images per page to show
+var pageSize = 5; //how many images per page to show
 var totalPages;
 var currentPage;
 var allImages = [];
@@ -75,18 +75,31 @@ var setupPages = function(cb){
 };
 
 
-var loadImages = function(idx){
+var loadImages = function(idx, cb){
   console.log("loadImages, idx: "+idx);
-  var imagesHolder = document.getElementsByClassName("images")[0];
-  clearHolder(imagesHolder);
+  // var imagesHolder = document.getElementsByClassName("images");
+  // console.log(imagesHolder.length);
 
-  for(var j=idx; j<idx+pageSize; j++){
-    if(j < allImages.length){ //partial page (if last page has less than full pageSize)
-      console.log('allImages['+j+']');
-      var thisImage = new ImageElement(allImages[j]);
-      imagesHolder.insertBefore(thisImage, imagesHolder.firstChild);
+
+  //
+  // for(var i = 0, ilen = imagesHolder.length; i<ilen;){
+  //   for(var j=idx; j<idx+pageSize; j++){
+  //   imagesHolder[i].src=allImages[j].path
+  //   console.log(allImages[j].path)
+  //   if(i == ilen-1 && j == idx+pageSize-1) cb();
+  //   }
+  // }
+  var imagesHolder = document.getElementsByClassName("images")[0];
+  clearHolder(imagesHolder, function(){
+    for(var j=idx; j<idx+pageSize; j++){
+      if(j < allImages.length){ //partial page (if last page has less than full pageSize)
+        console.log('allImages['+j+']');
+        var thisImage = new ImageElement(allImages[j]);
+        imagesHolder.insertBefore(thisImage, imagesHolder.firstChild);
+      }
     }
-  }
+    cb();
+  });
 };
 
 
@@ -94,14 +107,16 @@ var goToPage = function(pageNum){
   $("a.pagenum").parent().removeClass("active");
   $("a.pagenum[value='"+pageNum+"']").parent().addClass("active");
   var imgIdx = (pageNum*pageSize);
-  loadImages(imgIdx);
-  currentPage = pageNum;
+  loadImages(imgIdx, function(){
+    currentPage = pageNum;
+  });
 };
 
 
-var clearHolder = function(holder){
+var clearHolder = function(holder, cb){
   while (holder.firstChild) {
     holder.removeChild(holder.firstChild); //clear out all current images
   }
-  return true;
+  // return true;
+  cb();
 };
