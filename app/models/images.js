@@ -75,52 +75,84 @@ Images.methods.copyFile = function(copyType, cb){
 
   var rawPath = global.RAW_IMG_FOLDER+'/'+this.path;
   var outputPath;
-
+  var self = this;
   switch(copyType){
     case 'approve':
-      outputPath = global.APPROVED_FOLDER+'/'+this.path;
+      outputPath = global.APPROVED_FOLDER+'/'+self.path;
+      copyImage(rawPath, outputPath, cb);
       break;
     case 'heart':
-      outputPath = global.HEARTED_FOLDER+'/'+this.path;
+      outputPath = global.HEARTED_FOLDER+'/'+self.path;
+      copyImage(rawPath, outputPath, cb);
       break;
     case 'scale':
       console.log("copyType: scale");
-      outputPath = global.SCALED_IMG_FOLDER+'/'+this.path;
-      scaleImage(this, rawPath, outputPath, function(e){
-        if(e) return cb(e);
-        cb(null);
-      });
+      outputPath = global.SCALED_IMG_FOLDER+'/'+self.path;
+      //scaleImage(this, rawPath, outputPath, cb);
+      scaleImage(self, rawPath, outputPath, cb);
+    //  function(e){
+    //     if(e) console.log("scaleImage e: "+e);
+    //   });
       break;
     default: //console.log('a change event occured:',arguments);
       console.log('unknown copyType: '+copyType);
       break;
   }
+};
 
-  fs.readFile(rawPath, function (err, data) {
+var copyImage = function(_rawPath, _outputPath, cb){
+  fs.readFile(_rawPath, function (err, data) {
       if (err) return cb(err);
-      fs.writeFile(outputPath, data, function (_err) {
+      fs.writeFile(_outputPath, data, function (_err) {
           if (_err) return cb(_err);
           cb(null);
       });
   });
 };
 
+
 var scaleImage = function(img, rawPath, outputPath, cb){
   console.log("hit scaleImage: "+img.path);
+  console.log("img.path: "+img.path);
   lwip.open(rawPath, function(err, image){
-    if(err) return console.log("err opening img: "+err); cb(err);
-    image.scale(0.1, function(_err, image){
-      if(_err) return cb(_err);
-      image.toBuffer('jpg', function(e, buffer){
-        if(e) return cb(e);
-        fs.writeFile(outputPath, buffer, function(_e){
-          if(_e) return cb(_e);
-          cb(null);
-        });
-      });
+
+    image.batch()
+      .scale(0.25)          // scale to 75%
+      // .rotate(45, 'white')  // rotate 45degs clockwise (white fill)
+      // .crop(200, 200)       // crop a 200X200 square from center
+      // .blur(5)              // Gaussian blur with SD=5
+      .writeFile(outputPath, function(err){
+        // check err...
+        // done.
+        cb(err);
     });
   });
 };
+
+// var scaleImage = function(img, rawPath, outputPath, cb){
+//   console.log("hit scaleImage: "+img.path);
+//   console.log("img.path: "+img.path);
+//   lwip.open(rawPath, function(err, image){
+//     console.log("LWIP.OPEN");
+//     console.log("img.path: "+img.path);
+//     if(err) return console.log("err opening img: "+err); cb(err);
+//     image.scale(0.1, function(_err, image){
+//       console.log("LWIP.SCALE");
+//       console.log("img.path: "+img.path);
+//       if(_err) return cb(_err);
+//       image.toBuffer('jpg', function(e, buffer){
+//         console.log("LWIP.TOBUFFER");
+//         console.log("img.path: "+img.path);
+//         if(e) return cb(e);
+//         return cb(null);
+//         // fs.writeFile(outputPath, buffer, function(_e){
+//         //   if(_e) return cb(_e);
+//         //   return cb(null);
+//         // });
+//       });
+//     });
+//   });
+// };
 
 
 Images.statics.findOrCreate = function(files,callback){//function(query, sort, doc, options, callback){
