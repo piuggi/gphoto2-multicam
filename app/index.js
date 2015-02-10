@@ -19,18 +19,22 @@ var Cameras = require('./components/cameras.js');
 
 var cameras = 'test';
 
+global.NUM_CAMERAS = 0;
+
+global.TAKES = 0; /*** THIS NEEDS TO GO ***/
+
 /* Image folders */
 global.RAW_IMG_FOLDER = __dirname+'/images';
 global.SCALED_IMG_FOLDER = __dirname+'/scaled-images';
-global.APPROVED_FOLDER = '/Volumes/c/'; //__dirname+'/../../approved';
-global.HEARTED_FOLDER = '/Volumes/c/'; //__dirname+'/../../hearted';
-global.TAKES = 0;
-
+global.APPROVED_FOLDER = '/Volumes/livingroom/Desktop/NIKE_PUBLIC/approved';//'/Volumes/c/'; //__dirname+'/../../approved';
+global.HEARTED_FOLDER = '/Volumes/livingroom/Desktop/NIKE_PUBLIC/hearted';//'/Volumes/c/'; //__dirname+'/../../hearted';
+global.SOCIAL_FOLDER = '/Volumes/livingroom/Desktop/NIKE_PUBLIC/social';
 
 if (!fs.existsSync(global.RAW_IMG_FOLDER)) fs.mkdirSync(global.RAW_IMG_FOLDER);
 if (!fs.existsSync(global.SCALED_IMG_FOLDER)) fs.mkdirSync(global.SCALED_IMG_FOLDER);
 if (!fs.existsSync(global.APPROVED_FOLDER)) fs.mkdirSync(global.APPROVED_FOLDER);
 if (!fs.existsSync(global.HEARTED_FOLDER)) fs.mkdirSync(global.HEARTED_FOLDER);
+if (!fs.existsSync(global.SOCIAL_FOLDER)) fs.mkdirSync(global.SOCIAL_FOLDER);
 
 var Images = require(__dirname+'/models/images');
 
@@ -72,6 +76,10 @@ var fileCounter = 0;
 watchr.watch({
   path:'./app/images/',
   listener:  function(changeType,filePath,fileCurrentStat,filePreviousStat){
+    console.log('filePreviousStat: '.cyan+filePreviousStat);
+    console.log('fileCurrentStat: '.cyan+fileCurrentStat);
+    console.log('changeType: '.cyan+changeType);
+    console.log('File Added: '.green+filePath);
     switch(changeType){
       case 'create':
         console.log('File Added: '.green+filePath);
@@ -81,7 +89,11 @@ watchr.watch({
           img.copyFile('scale',function(e){
             io.sockets.emit('new-image',img);
             fileCounter++;
+            console.log("fileCounter: "+fileCounter);
+            console.log("cameras.cameras_.length: "+cameras.cameras_.length);
             if (fileCounter == cameras.cameras_.length){
+              console.log("socket.emit: finished");
+            //if(fileCounter == global.NUM_CAMERAS){
               fileCounter = 0;
               io.sockets.emit('finished', null);
             }

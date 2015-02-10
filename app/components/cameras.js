@@ -28,6 +28,7 @@ function Cameras(_cb){
       thisCam.id=id;
       self.cameras_[id] = thisCam;
       console.log('Found Camera '.cyan+id, 'model'.gray, thisCam.model, 'on port'.gray, thisCam.port);
+      global.NUM_CAMERAS++;
       id++;
       cb();
     }, function(_e){
@@ -44,17 +45,22 @@ function Cameras(_cb){
 
 Cameras.prototype.takePhotos = takePhotos =  function(_cb){
   global.TAKES++;
+  var self=this;
   var current_take = global.TAKES;
-  async.each(cameras_, function(cam, cb){
+  async.each(this.cameras_, function(cam, cb){
     console.log("take picture on cam: "+JSON.stringify(cam));
     cam.takePicture({
       targetPath: '/tmp/foo.XXXXXX'
       }, function (er, tmpname) {
         console.log("tmpname: "+tmpname);
+        if(!tmpname){
+          var _thisCamIdx = _.findIndex(self.cameras_, { 'id': cam.id });
+          self.cameras_.splice(_thisCamIdx, 1);
+          return cb("snap error: tmpname is undefined, camera: ".red + cam.id);
+        }
         var now = new Date();
         //var filePath =  global.RAW_IMG_FOLDER+'/'+now.getHours()+'.'+now.getMinutes()+'.'+now.getSeconds()+'.'+now.getMilliseconds()+'_cam_'+cam.id+'.jpg';
         var filePath = global.RAW_IMG_FOLDER+'/'+current_take+'_'+cam.id+'_'+(now.getMonth() + 1) + '' + now.getDate() + '' +  now.getFullYear() +'.'+now.getHours()+'.'+now.getMinutes()+'.'+now.getSeconds()+'.'+now.getMilliseconds()+'.jpg';
-        if(!tmpname) cb("snap error: tmpname is undefined, camera: ".red + cam.id);
         //--- asynchronous file copy
         fs.rename(tmpname, filePath.toString(), function(_er){
           if(_er) return cb(_er);

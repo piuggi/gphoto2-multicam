@@ -62,7 +62,7 @@ var Pagination = function(numPages){
 
 var setupPages = function(cb){
   totalPages = Math.ceil(allImages.length / pageSize);
-
+  console.log("setupPages, totalPages: "+totalPages);
   var navPageList = document.getElementById("page-list");
   navPageList.removeChild(navPageList.firstChild); //get rid of entire <ul>
   navPageList.appendChild(new Pagination(totalPages));
@@ -81,7 +81,7 @@ var loadImages = function(idx, cb){
   clearHolder(imagesHolder, function(){
     for(var j=idx; j<idx+pageSize; j++){
       if(j < allImages.length){ //partial page (if last page has less than full pageSize)
-        console.log('allImages['+j+']');
+        //console.log('allImages['+j+']');
         var thisImage = new ImageElement(allImages[j]);
         imagesHolder.insertBefore(thisImage, imagesHolder.firstChild);
       }
