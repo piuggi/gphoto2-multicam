@@ -2,6 +2,7 @@ var _ = require('lodash');
 var async = require('async');
 var mongoose = require('mongoose');
 var fs = require('fs');
+var lwip = require('lwip');
 
 var Images = mongoose.Schema({
 
@@ -43,12 +44,57 @@ Images.methods.heart = function(cb){
   });
 };
 
+Images.methods.scale = function(cb){
+  var self = this;
+  self.copyFile('scale', function(e){
+    if(!e) self.save(cb);
+    else {
+      console.log("image copy error: ".red+e);
+      cb(e);
+    }
+  });
+};
+
+
+// Images.methods.copyFile = function(copyType, cb){
+//
+//   var rawPath = global.RAW_IMG_FOLDER+'/'+this.path;
+//   var outputPath = (copyType === 'approve')? global.APPROVED_FOLDER : global.HEARTED_FOLDER;
+//   outputPath += ('/'+this.path);
+//
+//   fs.readFile(rawPath, function (err, data) {
+//       if (err) return cb(err);
+//       fs.writeFile(outputPath, data, function (_err) {
+//           if (_err) return cb(_err);
+//           cb(null);
+//       });
+//   });
+// };
 
 Images.methods.copyFile = function(copyType, cb){
 
   var rawPath = global.RAW_IMG_FOLDER+'/'+this.path;
-  var outputPath = (copyType === 'approve')? global.APPROVED_FOLDER : global.HEARTED_FOLDER;
-  outputPath += ('/'+this.path);
+  var outputPath;
+
+  switch(copyType){
+    case 'approve':
+      outputPath = global.APPROVED_FOLDER+'/'+this.path;
+      break;
+    case 'heart':
+      outputPath = global.HEARTED_FOLDER+'/'+this.path;
+      break;
+    case 'scale':
+      console.log("copyType: scale");
+      outputPath = global.SCALED_IMG_FOLDER+'/'+this.path;
+      scaleImage(this, rawPath, outputPath, function(e){
+        if(e) return cb(e);
+        cb(null);
+      });
+      break;
+    default: //console.log('a change event occured:',arguments);
+      console.log('unknown copyType: '+copyType);
+      break;
+  }
 
   fs.readFile(rawPath, function (err, data) {
       if (err) return cb(err);
@@ -56,6 +102,23 @@ Images.methods.copyFile = function(copyType, cb){
           if (_err) return cb(_err);
           cb(null);
       });
+  });
+};
+
+var scaleImage = function(img, rawPath, outputPath, cb){
+  console.log("hit scaleImage: "+img.path);
+  lwip.open(rawPath, function(err, image){
+    if(err) return console.log("err opening img: "+err); cb(err);
+    image.scale(0.1, function(_err, image){
+      if(_err) return cb(_err);
+      image.toBuffer('jpg', function(e, buffer){
+        if(e) return cb(e);
+        fs.writeFile(outputPath, buffer, function(_e){
+          if(_e) return cb(_e);
+          cb(null);
+        });
+      });
+    });
   });
 };
 

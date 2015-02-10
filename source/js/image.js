@@ -7,7 +7,7 @@ var ImageElement = function(image){
   this.thumbHolder.className = "thumbnail";
 
   this.img = document.createElement("img");
-  this.img.src = 'images/'+image.path;
+  this.img.src = 'scaled-images/'+image.path;
 
   this.caption = document.createElement("div");
   this.caption.className = "caption";
