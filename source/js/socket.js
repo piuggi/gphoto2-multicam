@@ -43,9 +43,10 @@ socket.on('new-image', function(image){
 
 
 socket.on('finished', function(){
+  console.log("socket: finished");
   //location.reload();
   setupPages(function(imgIdx){
-    loadImages(imgIdx, function(){
+   loadImages(imgIdx, function(){
       $('#processingDialog').modal('hide');
       $('#loadingDialog').modal('hide');
     });
