@@ -28,7 +28,6 @@ function Cameras(_cb){
       thisCam.id=id;
       self.cameras_[id] = thisCam;
       console.log('Found Camera '.cyan+id, 'model'.gray, thisCam.model, 'on port'.gray, thisCam.port);
-      global.NUM_CAMERAS++;
       id++;
       cb();
     }, function(_e){
