@@ -127,13 +127,13 @@ var setupSockets = function(){
   //console.log(cameras);
   io.on('connection', function(socket){
     console.log('socket connection created.'.yellow);
-    if(!setupComplete) socket.emit('loading', null);
+    if(!setupComplete) socket.broadcast.emit('loading', null);
     // fs.readdir(global.RAW_IMG_FOLDER,function(err,files){
     fs.readdir(global.SCALED_IMG_FOLDER,function(err,files){
       //checkout /images for all image files, (exclude DS_Store);
       Images.findOrCreate(_.without(files, ".DS_Store"),function(err,_images){
         if(err) return socket.emit('error',err);
-        return socket.emit('init',_images);
+        return socket.broadcast.emit('init',_images);
       });
     });
 
