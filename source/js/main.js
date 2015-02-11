@@ -33,7 +33,7 @@ var Pagination = function(thisPage, numPages){
   }
   // var below = (pageStart>3)? 3 : 3-pageStart;
   var below = ((pageStart+3)>numPages)? 2+(numPages-pageStart) : 3;
-  var above = ((pageStart-3)<0) ? pageStart : 3;
+  var above = ((pageStart-3)<=0) ? pageStart : 3;
   for(var i=pageStart-below; i<pageStart+above; i++){
     if(i<numPages && i>=0){
       this.page = document.createElement("li");
