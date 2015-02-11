@@ -67,7 +67,7 @@ var startApp = function(cb){
       console.log('Good Bye.'.red);
       process.exit(1);
       }
-    startApp(cb);
+    //startApp(cb);//turning reboot off.
   });
   cb();
 };
