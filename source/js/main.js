@@ -7,7 +7,7 @@ var allImages = [];
 
 $(document).ready(function(){
   console.log("pageSize: "+pageSize + " imgs per page");
-  $('#take-photo').click(function(e){
+  $('.take-photo').click(function(e){
     $('#processingDialog').modal('show');
     socket.emit('snap',{snap: 0});
   });
