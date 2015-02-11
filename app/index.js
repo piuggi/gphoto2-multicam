@@ -21,7 +21,7 @@ var cameras = 'test';
 
 var Takes = require('./components/takes');
 var takes = new Takes();
-
+var processingTake = false;
 
 /* Image folders */
 global.RAW_IMG_FOLDER = __dirname+'/images';
@@ -88,8 +88,9 @@ watchr.watch({
             console.log("fileCounter: "+fileCounter);
             //console.log("cameras.cameras_.length: "+cameras.cameras_.length);
             if (fileCounter == cameras.cameras_.length){
-              console.log("socket.emit: finished");
+              processingTake = false;
               fileCounter = 0;
+              console.log("socket.emit: finished");
               io.sockets.emit('finished', null);
             }
           });
@@ -165,8 +166,11 @@ var setupSockets = function(){
     });
 
     socket.on('snap',function(data){
-      console.log('Snap Photo! '.green+JSON.stringify(data));
-      cameras.takePhotos(function(e){});
+      if(!processingTake){
+        processingTake = true;
+        console.log('Snap Photo! '.green+JSON.stringify(data));
+        cameras.takePhotos(function(e){});
+      } else console.log('Snap Photo: '+'Wait for previous take to finish processing'.red);
     });
   });
 };

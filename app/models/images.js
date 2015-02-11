@@ -56,21 +56,6 @@ Images.methods.scale = function(cb){
 };
 
 
-// Images.methods.copyFile = function(copyType, cb){
-//
-//   var rawPath = global.RAW_IMG_FOLDER+'/'+this.path;
-//   var outputPath = (copyType === 'approve')? global.APPROVED_FOLDER : global.HEARTED_FOLDER;
-//   outputPath += ('/'+this.path);
-//
-//   fs.readFile(rawPath, function (err, data) {
-//       if (err) return cb(err);
-//       fs.writeFile(outputPath, data, function (_err) {
-//           if (_err) return cb(_err);
-//           cb(null);
-//       });
-//   });
-// };
-
 Images.methods.copyFile = function(copyType, cb){
 
   var rawPath = global.RAW_IMG_FOLDER+'/'+this.path;
@@ -116,42 +101,13 @@ var scaleImage = function(img, rawPath, outputPath, cb){
   lwip.open(rawPath, function(err, image){
 
     image.batch()
-      .scale(0.15)
-      // .rotate(45, 'white')  // rotate 45degs clockwise (white fill)
-      // .crop(200, 200)       // crop a 200X200 square from center
-      // .blur(5)              // Gaussian blur with SD=5
+      .scale(0.15) //.rotate(45, 'white')  .crop(200, 200) .blur(5)
       .writeFile(outputPath, function(err){
-        // check err...
-        // done.
         cb(err);
     });
   });
 };
 
-// var scaleImage = function(img, rawPath, outputPath, cb){
-//   console.log("hit scaleImage: "+img.path);
-//   console.log("img.path: "+img.path);
-//   lwip.open(rawPath, function(err, image){
-//     console.log("LWIP.OPEN");
-//     console.log("img.path: "+img.path);
-//     if(err) return console.log("err opening img: "+err); cb(err);
-//     image.scale(0.1, function(_err, image){
-//       console.log("LWIP.SCALE");
-//       console.log("img.path: "+img.path);
-//       if(_err) return cb(_err);
-//       image.toBuffer('jpg', function(e, buffer){
-//         console.log("LWIP.TOBUFFER");
-//         console.log("img.path: "+img.path);
-//         if(e) return cb(e);
-//         return cb(null);
-//         // fs.writeFile(outputPath, buffer, function(_e){
-//         //   if(_e) return cb(_e);
-//         //   return cb(null);
-//         // });
-//       });
-//     });
-//   });
-// };
 
 Images.statics.findOrCreate = function(files,callback){//function(query, sort, doc, options, callback){
   var self = this;

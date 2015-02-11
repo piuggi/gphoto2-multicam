@@ -6,55 +6,58 @@ socket.on('init', function(images){
   allImages = images;
   console.log("allImages length: "+allImages.length);
   IMAGE_TAKER = true;
-  setupPages(function(imgIdx){
-    loadImages(imgIdx, function(){
-      // IMAGE_TAKER = false;
-    });
+  setupPages(null, function(imgIdx){
+    loadImages(imgIdx, function(){ });
   });
 });
 
+
 socket.on('approved', function(image){
   console.log('approved: \n %s',JSON.stringify(image));
+  var thisImgIdx = _.findIndex(allImages, {'_id':image._id});
+  allImages[thisImgIdx].approved = true;
+
   var imageElm = document.getElementsByClassName(image._id)[0];
-  console.log(imageElm);
-  var button = imageElm.getElementsByClassName('approve')[0];
-  button.className = "btn btn-primary approve active";
-  console.log(button.className);
+  if(imageElm){ //we are on the page of this newly approved item
+    //console.log(imageElm);
+    var button = imageElm.getElementsByClassName('approve')[0];
+    button.className = "btn btn-primary approve active";
+  }
 });
+
 
 socket.on('hearted', function(image){
-  console.log('approved: \n %s',JSON.stringify(image));
+  console.log('hearted: \n %s',JSON.stringify(image));
+  var thisImgIdx = _.findIndex(allImages, {'_id':image._id});
+  allImages[thisImgIdx].hearted = true;
+
   var imageElm = document.getElementsByClassName(image._id)[0];
-  console.log(imageElm);
-  var button = imageElm.getElementsByClassName('heart')[0];
-  button.className = "btn btn-danger heart active";
+  if(imageElm){
+    //console.log(imageElm);
+    var button = imageElm.getElementsByClassName('heart')[0];
+    button.className = "btn btn-danger heart active";
+  }
 });
 
+
 socket.on('new-image', function(image){
-
-  console.log("socket.on: new-image");
   allImages.push(image);
-
-  console.log("allImages length: "+allImages.length);
-  // setupPages(function(imgIdx){
-  //   loadImages(imgIdx);
-  // });
+  console.log(">> socket.on: new-image, allImages length: "+allImages.length);
 });
 
 
 socket.on('finished', function(){
   console.log("socket: finished");
   //location.reload();
-  IMAGE_TAKER = (currentPage == totalPages-1)? true : false; //if we're on the last page, then update
-  setupPages(function(imgIdx){
-    if(IMAGE_TAKER || onCurrPage){
-     loadImages(imgIdx, function(){
+  if(!IMAGE_TAKER) IMAGE_TAKER = (currentPage == totalPages-1)? true : false; //if we're on the last page, then update
+  if(IMAGE_TAKER){
+    setupPages(null, function(imgIdx){
+      loadImages(imgIdx, function(){
         $('#processingDialog').modal('hide');
         $('#loadingDialog').modal('hide');
-        // IMAGE_TAKER = false;
       });
-    }
-  });
+    });
+  }
 });
 
 

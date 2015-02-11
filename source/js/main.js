@@ -16,29 +16,45 @@ $(document).ready(function(){
 });
 
 
-var Pagination = function(numPages){
+var Pagination = function(thisPage, numPages){
   this.pagination = document.createElement("ul");
   this.pagination.className = "pagination pagination-lg";
 
   this.previous = document.createElement("li");
   this.previous.insertAdjacentHTML('afterbegin', '<a href="#" class="prev-page" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>');
   this.pagination.appendChild(this.previous);
-
-
-  for(var i=0; i<numPages; i++){
-    this.page = document.createElement("li");
-    this.pageLink = document.createElement("a");
-    this.pageLink.className = "pagenum";
-    this.pageLink.setAttribute("value", i);
-
-    attachPageLinkListener(this.pageLink, i);
-
-    this.pageNumber = document.createTextNode(i);
-    this.pageLink.appendChild(this.pageNumber);
-    this.page.appendChild(this.pageLink);
-    this.pagination.appendChild(this.page);
+  var pageStart = numPages;
+  if(numPages > 6){
+    pageStart = numPages-3;
+    //this.pagination.insertAdjacentHTML('afterbegin', '...');
   }
+  if(thisPage !== null){ //sometimes thisPage is '0'!
+    //console.log("thisPage: "+thisPage);
+    pageStart = thisPage;
+  }
+  // var below = (pageStart>3)? 3 : 3-pageStart;
+  //console.log("-- pageStart: "+pageStart);
+  var below = ((pageStart+3)>numPages)? 2+(numPages-pageStart) : 3;
+  //console.log("-- below: "+below);
+  //var above = ((pageStart-3)<=0) ? pageStart : 3;
+  var above = (pageStart < 3)? (3+(3-pageStart)) : 3;
+  //console.log("-- above: "+above);
+  for(var i=pageStart-below; i<pageStart+above; i++){
+    if(i<numPages && i>=0){
+      this.page = document.createElement("li");
+      this.pageLink = document.createElement("a");
+      this.pageLink.className = "pagenum";
+      this.pageLink.setAttribute("value", i);
 
+      attachPageLinkListener(this.pageLink, i);
+
+      this.pageNumber = document.createTextNode(i);
+      this.pageLink.appendChild(this.pageNumber);
+      this.page.appendChild(this.pageLink);
+      this.pagination.appendChild(this.page);
+    }
+  }
+  //if(pageStart+5 <numPages) this.pagination.insertAdjacentHTML('afterend','...');
   function attachPageLinkListener(_pageLink, pageNum){
     _pageLink.addEventListener("click",function(e){
       console.log("page click: "+pageNum);
@@ -62,14 +78,15 @@ var Pagination = function(numPages){
 
 
 
-var setupPages = function(cb){
+var setupPages = function(pageNum, cb){
   totalPages = Math.ceil(allImages.length / pageSize);
   console.log("setupPages, totalPages: "+totalPages);
   var navPageList = document.getElementById("page-list");
   navPageList.removeChild(navPageList.firstChild); //get rid of entire <ul>
-  navPageList.appendChild(new Pagination(totalPages));
+  navPageList.appendChild(new Pagination(pageNum, totalPages));
 
   if(IMAGE_TAKER) currentPage = totalPages-1;
+  else currentPage = pageNum;
 
   $("a.pagenum[value='"+currentPage+"']").parent().addClass("active");
   var imgIdx = (currentPage*pageSize);
@@ -79,18 +96,7 @@ var setupPages = function(cb){
 
 var loadImages = function(idx, cb){
   console.log("loadImages, idx: "+idx);
-  // var imagesHolder = document.getElementsByClassName("images");
-  // console.log(imagesHolder.length);
 
-
-  //
-  // for(var i = 0, ilen = imagesHolder.length; i<ilen;){
-  //   for(var j=idx; j<idx+pageSize; j++){
-  //   imagesHolder[i].src=allImages[j].path
-  //   console.log(allImages[j].path)
-  //   if(i == ilen-1 && j == idx+pageSize-1) cb();
-  //   }
-  // }
   var imagesHolder = document.getElementsByClassName("images")[0];
   clearHolder(imagesHolder, function(){
     for(var j=idx; j<idx+pageSize; j++){
@@ -107,12 +113,14 @@ var loadImages = function(idx, cb){
 
 
 var goToPage = function(pageNum){
+  console.log("goToPage: "+pageNum);
   $("a.pagenum").parent().removeClass("active");
   $("a.pagenum[value='"+pageNum+"']").parent().addClass("active");
-  var imgIdx = (pageNum*pageSize);
-  IMAGE_TAKER = true;
-  loadImages(imgIdx, function(){
-    currentPage = pageNum;
+  IMAGE_TAKER = false;
+  setupPages(pageNum,function(imgIdx){
+    loadImages(imgIdx, function(){
+      currentPage = pageNum;
+    });
   });
 };
 
