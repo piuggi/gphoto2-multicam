@@ -28,12 +28,17 @@ var Pagination = function(thisPage, numPages){
     pageStart = numPages-3;
     //this.pagination.insertAdjacentHTML('afterbegin', '...');
   }
-  if(thisPage){
+  if(thisPage !== null){ //sometimes thisPage is '0'!
+    //console.log("thisPage: "+thisPage);
     pageStart = thisPage;
   }
   // var below = (pageStart>3)? 3 : 3-pageStart;
+  //console.log("-- pageStart: "+pageStart);
   var below = ((pageStart+3)>numPages)? 2+(numPages-pageStart) : 3;
-  var above = ((pageStart-3)<=0) ? pageStart : 3;
+  //console.log("-- below: "+below);
+  //var above = ((pageStart-3)<=0) ? pageStart : 3;
+  var above = (pageStart < 3)? (3+(3-pageStart)) : 3;
+  //console.log("-- above: "+above);
   for(var i=pageStart-below; i<pageStart+above; i++){
     if(i<numPages && i>=0){
       this.page = document.createElement("li");
