@@ -57,50 +57,22 @@ var _Button = function(image,cl,glyph,state){
 
   this.btn = document.createElement("button");
 
-  // if(cl === 'approve'){
-  //   console.log("set up approve button, state: "+state);
-  //   if(state){
-  //     this.btn.className = "btn btn-primary "+cl+" active";
-  //   } else {
-  //     this.btn.className = "btn btn-default "+cl +" inactive";
-  //   }
-  // }
-  // else if(cl === 'heart'){
-  //   console.log("set up heart button, state: "+state);
-  //   if(state){
-  //     this.btn.className = "btn btn-danger "+cl+" active";
-  //   } else {
-  //     this.btn.className = "btn btn-default "+cl +" inactive";
-  //   }
-  // }
-  //if(cl === 'approve') this.btn.className = (state)? "btn btn-primary "+cl+" disabled" : "btn btn-default "+cl+" active";
-  //else if(cl === 'heart') this.btn.className = (state)? "btn btn-danger "+cl+" disabled" : "btn btn-default "+cl+" active";
-
   if(cl === 'approve') this.btn.className = (state)? "btn btn-primary "+cl+" active" : "btn btn-default "+cl+" inactive";
   else if(cl === 'heart') this.btn.className = (state)? "btn btn-danger "+cl+" active" : "btn btn-default "+cl+" inactive";
   else this.btn.className = (state)? "btn btn-default "+cl+" disabled" : "btn btn-default "+cl;
 
   this.btn.setAttribute("role", "button");
   this.btn.setAttribute("type", "button");
-  if(state == false){
+  if(state === false){
     this.btn.addEventListener("click",function(e){
       switch(cl){
         case 'approve':
-          //if(state == false){
             socket.emit(cl,{_id: image._id});
             _this.btn.className = "btn btn-primary "+cl+" active";
-            //if(cl === 'approve') _this.btn.className = "btn btn-primary "+cl+" active";
-            //else if(cl === 'heart') _this.btn.className = "btn btn-danger "+cl+" active";
-          //}
           break;
         case 'heart':
-          //console.log('here');
-          //if(state == false){
             socket.emit(cl,{_id: image._id});
             _this.btn.className = "btn btn-danger "+cl+" active";
-            //if(cl === 'approve') _this.btn.className = "btn btn-primary "+cl+" active";
-            //else if(cl === 'heart') _this.btn.className = "btn btn-danger "+cl+" active";
-          //}
           break;
         default:
           break;
