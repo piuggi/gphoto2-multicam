@@ -42,7 +42,7 @@ $ echo "nvm use 0.10" >> ~/.bash_profile
 $ source ~/.bash_profile
 ```
 
-** Setup gPhoto2 **
+**Setup gPhoto2**
 
 ```
 $ vim ~/.gphoto/settings
