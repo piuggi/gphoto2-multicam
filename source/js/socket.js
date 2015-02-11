@@ -2,7 +2,7 @@
 var socket = io.connect(window.location.hostname+':8081');
 
 socket.on('init', function(images){
-
+  console.log(">> socket.init");
   allImages = images;
   console.log("allImages length: "+allImages.length);
 
@@ -56,4 +56,9 @@ socket.on('finished', function(){
 
 socket.on('loading', function(){
   $('#loadingDialog').modal('show');
+});
+
+socket.on('error', function(err){
+  // $('#loadingDialog').modal('show');
+  console.log("RECEIVED socket.ERROR: "+err);
 });
