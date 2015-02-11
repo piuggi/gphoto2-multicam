@@ -91,18 +91,7 @@ var setupPages = function(pageNum, cb){
 
 var loadImages = function(idx, cb){
   console.log("loadImages, idx: "+idx);
-  // var imagesHolder = document.getElementsByClassName("images");
-  // console.log(imagesHolder.length);
 
-
-  //
-  // for(var i = 0, ilen = imagesHolder.length; i<ilen;){
-  //   for(var j=idx; j<idx+pageSize; j++){
-  //   imagesHolder[i].src=allImages[j].path
-  //   console.log(allImages[j].path)
-  //   if(i == ilen-1 && j == idx+pageSize-1) cb();
-  //   }
-  // }
   var imagesHolder = document.getElementsByClassName("images")[0];
   clearHolder(imagesHolder, function(){
     for(var j=idx; j<idx+pageSize; j++){
@@ -122,7 +111,6 @@ var goToPage = function(pageNum){
   console.log("goToPage: "+pageNum);
   $("a.pagenum").parent().removeClass("active");
   $("a.pagenum[value='"+pageNum+"']").parent().addClass("active");
-  // var imgIdx = (pageNum*pageSize);
   IMAGE_TAKER = false;
   setupPages(pageNum,function(imgIdx){
     loadImages(imgIdx, function(){
