@@ -1,6 +1,6 @@
 
 /* session vars */
-var pageSize = 5; //how many images per page to show
+var pageSize = 10; //how many images per page to show
 var totalPages;
 var currentPage;
 var allImages = [];

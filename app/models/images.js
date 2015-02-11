@@ -85,14 +85,14 @@ Images.methods.copyFile = function(copyType, cb){
       outputPath = global.HEARTED_FOLDER+'/'+self.path;
       copyImage(rawPath, outputPath, cb);
       break;
+    case 'social':
+      outputPath = global.SOCIAL_FOLDER+'/'+self.path;
+      copyImage(rawPath, outputPath, cb);
+      break;
     case 'scale':
       console.log("copyType: scale");
       outputPath = global.SCALED_IMG_FOLDER+'/'+self.path;
-      //scaleImage(this, rawPath, outputPath, cb);
       scaleImage(self, rawPath, outputPath, cb);
-    //  function(e){
-    //     if(e) console.log("scaleImage e: "+e);
-    //   });
       break;
     default: //console.log('a change event occured:',arguments);
       console.log('unknown copyType: '+copyType);
