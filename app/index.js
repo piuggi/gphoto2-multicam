@@ -26,9 +26,10 @@ global.TAKES = 0; /*** THIS NEEDS TO GO ***/
 /* Image folders */
 global.RAW_IMG_FOLDER = __dirname+'/images';
 global.SCALED_IMG_FOLDER = __dirname+'/scaled-images';
-global.APPROVED_FOLDER = '/Volumes/livingroom/Desktop/NIKE_PUBLIC/approved';//'/Volumes/c/'; //__dirname+'/../../approved';
-global.HEARTED_FOLDER = '/Volumes/livingroom/Desktop/NIKE_PUBLIC/hearted';//'/Volumes/c/'; //__dirname+'/../../hearted';
-global.SOCIAL_FOLDER = '/Volumes/livingroom/Desktop/NIKE_PUBLIC/social';
+global.REMOTE_PATH = '/Users/chris';//'/Volumes/livingroom';
+global.APPROVED_FOLDER = global.REMOTE_PATH+'/Desktop/NIKE_PUBLIC/approved';//'/Volumes/c/'; //__dirname+'/../../approved';
+global.HEARTED_FOLDER  = global.REMOTE_PATH+'/Desktop/NIKE_PUBLIC/hearted';//'/Volumes/c/'; //__dirname+'/../../hearted';
+global.SOCIAL_FOLDER   =  global.REMOTE_PATH+'/Desktop/NIKE_PUBLIC/social';
 
 if (!fs.existsSync(global.RAW_IMG_FOLDER)) fs.mkdirSync(global.RAW_IMG_FOLDER);
 if (!fs.existsSync(global.SCALED_IMG_FOLDER)) fs.mkdirSync(global.SCALED_IMG_FOLDER);
