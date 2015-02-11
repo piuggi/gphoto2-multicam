@@ -46,15 +46,15 @@ socket.on('finished', function(){
   console.log("socket: finished");
   //location.reload();
   IMAGE_TAKER = (currentPage == totalPages-1)? true : false; //if we're on the last page, then update
-  setupPages(null, function(imgIdx){
-    if(IMAGE_TAKER || onCurrPage){
+  if(IMAGE_TAKER){
+    setupPages(null, function(imgIdx){
      loadImages(imgIdx, function(){
         $('#processingDialog').modal('hide');
         $('#loadingDialog').modal('hide');
         // IMAGE_TAKER = false;
-      });
-    }
-  });
+    });
+    });
+  }
 });
 
 
