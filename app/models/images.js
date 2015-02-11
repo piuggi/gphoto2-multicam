@@ -154,7 +154,6 @@ var scaleImage = function(img, rawPath, outputPath, cb){
 //   });
 // };
 
-
 Images.statics.findOrCreate = function(files,callback){//function(query, sort, doc, options, callback){
   var self = this;
   this.collection.find({path:{$in:files}}).toArray(function(err,_files){
