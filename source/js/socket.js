@@ -8,7 +8,7 @@ socket.on('init', function(images){
   IMAGE_TAKER = true;
   setupPages(function(imgIdx){
     loadImages(imgIdx, function(){
-      IMAGE_TAKER = false;
+      // IMAGE_TAKER = false;
     });
   });
 });
@@ -50,7 +50,7 @@ socket.on('finished', function(){
      loadImages(imgIdx, function(){
         $('#processingDialog').modal('hide');
         $('#loadingDialog').modal('hide');
-        IMAGE_TAKER = false;
+        // IMAGE_TAKER = false;
       });
     }
   });

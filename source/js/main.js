@@ -69,7 +69,7 @@ var setupPages = function(cb){
   navPageList.removeChild(navPageList.firstChild); //get rid of entire <ul>
   navPageList.appendChild(new Pagination(totalPages));
 
-  if(IMAGE_TAKER) currentPage = totalPages-1;  
+  if(IMAGE_TAKER) currentPage = totalPages-1;
 
   $("a.pagenum[value='"+currentPage+"']").parent().addClass("active");
   var imgIdx = (currentPage*pageSize);
@@ -100,6 +100,7 @@ var loadImages = function(idx, cb){
         imagesHolder.insertBefore(thisImage, imagesHolder.firstChild);
       }
     }
+    IMAGE_TAKER = false;
     cb();
   });
 };
@@ -109,6 +110,7 @@ var goToPage = function(pageNum){
   $("a.pagenum").parent().removeClass("active");
   $("a.pagenum[value='"+pageNum+"']").parent().addClass("active");
   var imgIdx = (pageNum*pageSize);
+  IMAGE_TAKER = true;
   loadImages(imgIdx, function(){
     currentPage = pageNum;
   });
