@@ -5,10 +5,10 @@ socket.on('init', function(images){
   console.log(">> socket.on: init");
   allImages = images;
   console.log("allImages length: "+allImages.length);
-
+  IMAGE_TAKER = true;
   setupPages(function(imgIdx){
     loadImages(imgIdx, function(){
-
+      // IMAGE_TAKER = false;
     });
   });
 });
@@ -45,11 +45,15 @@ socket.on('new-image', function(image){
 socket.on('finished', function(){
   console.log("socket: finished");
   //location.reload();
+  IMAGE_TAKER = (currentPage == totalPages-1)? true : false; //if we're on the last page, then update
   setupPages(function(imgIdx){
-   loadImages(imgIdx, function(){
-      $('#processingDialog').modal('hide');
-      $('#loadingDialog').modal('hide');
-    });
+    if(IMAGE_TAKER || onCurrPage){
+     loadImages(imgIdx, function(){
+        $('#processingDialog').modal('hide');
+        $('#loadingDialog').modal('hide');
+        // IMAGE_TAKER = false;
+      });
+    }
   });
 });
 

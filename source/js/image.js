@@ -33,7 +33,7 @@ var _ButtonToolbar = function(image){
   this.btngroup.className = "btn-group";
   this.btngroup.setAttribute("role", "group");
 
-  this.btngroup.appendChild(new _Button(image,'details', 'search',false));
+  // this.btngroup.appendChild(new _Button(image,'details', 'search',false));
   this.btngroup.appendChild(new _Button(image,'approve', 'ok', image.approved));
   this.btngroup.appendChild(new _Button(image,'heart', 'heart', image.hearted));
 

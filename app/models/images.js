@@ -90,7 +90,6 @@ Images.methods.copyFile = function(copyType, cb){
       copyImage(rawPath, outputPath, cb);
       break;
     case 'scale':
-      console.log("copyType: scale");
       outputPath = global.SCALED_IMG_FOLDER+'/'+self.path;
       scaleImage(self, rawPath, outputPath, cb);
       break;
@@ -113,11 +112,11 @@ var copyImage = function(_rawPath, _outputPath, cb){
 
 var scaleImage = function(img, rawPath, outputPath, cb){
   console.log("hit scaleImage: "+img.path);
-  console.log("img.path: "+img.path);
+  //console.log("img.path: "+img.path);
   lwip.open(rawPath, function(err, image){
 
     image.batch()
-      .scale(0.25)          // scale to 75%
+      .scale(0.15)
       // .rotate(45, 'white')  // rotate 45degs clockwise (white fill)
       // .crop(200, 200)       // crop a 200X200 square from center
       // .blur(5)              // Gaussian blur with SD=5

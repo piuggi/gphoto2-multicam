@@ -21,12 +21,12 @@ var cameras = 'test';
 
 var Takes = require('./components/takes');
 var takes = new Takes();
-global.TAKES = 0; /*** THIS NEEDS TO GO ***/
+
 
 /* Image folders */
 global.RAW_IMG_FOLDER = __dirname+'/images';
 global.SCALED_IMG_FOLDER = __dirname+'/scaled-images';
-global.REMOTE_PATH = '/Users/chris';//'/Volumes/livingroom';
+global.REMOTE_PATH = '/Volumes/livingroom';//'/Users/chris';//'/Volumes/livingroom';
 global.APPROVED_FOLDER = global.REMOTE_PATH+'/Desktop/NIKE_PUBLIC/approved';//'/Volumes/c/'; //__dirname+'/../../approved';
 global.HEARTED_FOLDER  = global.REMOTE_PATH+'/Desktop/NIKE_PUBLIC/hearted';//'/Volumes/c/'; //__dirname+'/../../hearted';
 global.SOCIAL_FOLDER   =  global.REMOTE_PATH+'/Desktop/NIKE_PUBLIC/social';
@@ -72,10 +72,10 @@ var fileCounter = 0;
 watchr.watch({
   path:'./app/images/',
   listener:  function(changeType,filePath,fileCurrentStat,filePreviousStat){
-    console.log('filePreviousStat: '.cyan+filePreviousStat);
-    console.log('fileCurrentStat: '.cyan+fileCurrentStat);
-    console.log('changeType: '.cyan+changeType);
-    console.log('File Added: '.green+filePath);
+    //console.log('filePreviousStat: '.cyan+filePreviousStat);
+    //console.log('fileCurrentStat: '.cyan+fileCurrentStat);
+    // console.log('changeType: '.cyan+changeType);
+    //console.log('File Added: '.green+filePath);
     switch(changeType){
       case 'create':
         console.log('File Added: '.green+filePath);
@@ -86,7 +86,7 @@ watchr.watch({
             io.sockets.emit('new-image',img);
             fileCounter++;
             console.log("fileCounter: "+fileCounter);
-            console.log("cameras.cameras_.length: "+cameras.cameras_.length);
+            //console.log("cameras.cameras_.length: "+cameras.cameras_.length);
             if (fileCounter == cameras.cameras_.length){
               console.log("socket.emit: finished");
               fileCounter = 0;

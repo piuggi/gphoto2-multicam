@@ -4,10 +4,12 @@ var pageSize = 10; //how many images per page to show
 var totalPages;
 var currentPage;
 var allImages = [];
+var IMAGE_TAKER = false;
 
 $(document).ready(function(){
   console.log("pageSize: "+pageSize + " imgs per page");
   $('.take-photo').click(function(e){
+    IMAGE_TAKER = true;
     $('#processingDialog').modal('show');
     socket.emit('snap',{snap: 0});
   });
@@ -67,10 +69,10 @@ var setupPages = function(cb){
   navPageList.removeChild(navPageList.firstChild); //get rid of entire <ul>
   navPageList.appendChild(new Pagination(totalPages));
 
-  currentPage = totalPages-1;
-  var imgIdx = (currentPage*pageSize);
-  $("a.pagenum[value='"+currentPage+"']").parent().addClass("active");
+  if(IMAGE_TAKER) currentPage = totalPages-1;
 
+  $("a.pagenum[value='"+currentPage+"']").parent().addClass("active");
+  var imgIdx = (currentPage*pageSize);
   cb(imgIdx);
 };
 
@@ -98,6 +100,7 @@ var loadImages = function(idx, cb){
         imagesHolder.insertBefore(thisImage, imagesHolder.firstChild);
       }
     }
+    IMAGE_TAKER = false;
     cb();
   });
 };
@@ -107,6 +110,7 @@ var goToPage = function(pageNum){
   $("a.pagenum").parent().removeClass("active");
   $("a.pagenum[value='"+pageNum+"']").parent().addClass("active");
   var imgIdx = (pageNum*pageSize);
+  IMAGE_TAKER = true;
   loadImages(imgIdx, function(){
     currentPage = pageNum;
   });
