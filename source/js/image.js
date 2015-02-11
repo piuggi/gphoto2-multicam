@@ -68,10 +68,12 @@ var _Button = function(image,cl,glyph,state){
       switch(cl){
         case 'approve':
             socket.emit(cl,{_id: image._id});
+            image.approved = true;
             _this.btn.className = "btn btn-primary "+cl+" active";
           break;
         case 'heart':
             socket.emit(cl,{_id: image._id});
+            image.hearted = true;
             _this.btn.className = "btn btn-danger "+cl+" active";
           break;
         default:
