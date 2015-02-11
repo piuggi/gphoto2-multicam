@@ -2,7 +2,9 @@ var colors = require('colors');
 var _ = require('lodash');
 var async = require('async');
 var fs = require('fs');
+var Takes = require('./takes');
 
+var takes = new Takes();
 
 var _gphoto2 = require('gphoto2');
 var _GPhoto = new _gphoto2.GPhoto2();
@@ -43,9 +45,11 @@ function Cameras(_cb){
 
 
 Cameras.prototype.takePhotos = takePhotos =  function(_cb){
-  global.TAKES++;
+
   var self=this;
-  var current_take = global.TAKES;
+  takes.inc();//global.TAKES++;
+  var current_take = takes.current();//global.TAKES;
+
   async.each(this.cameras_, function(cam, cb){
     console.log("take picture on cam: "+JSON.stringify(cam));
     cam.takePicture({
@@ -57,6 +61,7 @@ Cameras.prototype.takePhotos = takePhotos =  function(_cb){
           self.cameras_.splice(_thisCamIdx, 1);
           return cb("snap error: tmpname is undefined, camera: ".red + cam.id);
         }
+
         var now = new Date();
         //var filePath =  global.RAW_IMG_FOLDER+'/'+now.getHours()+'.'+now.getMinutes()+'.'+now.getSeconds()+'.'+now.getMilliseconds()+'_cam_'+cam.id+'.jpg';
         var filePath = global.RAW_IMG_FOLDER+'/'+current_take+'_'+cam.id+'_'+(now.getMonth() + 1) + '' + now.getDate() + '' +  now.getFullYear() +'.'+now.getHours()+'.'+now.getMinutes()+'.'+now.getSeconds()+'.'+now.getMilliseconds()+'.jpg';
