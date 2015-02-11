@@ -23,9 +23,12 @@ var Pagination = function(numPages){
   this.previous = document.createElement("li");
   this.previous.insertAdjacentHTML('afterbegin', '<a href="#" class="prev-page" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>');
   this.pagination.appendChild(this.previous);
-
-
-  for(var i=0; i<numPages; i++){
+  var pageStart = 0;
+  if(numPages > 5){
+    pageStart = numPages-5;
+    this.pagination.insertAdjacentHTML('afterbegin', '...');
+  }
+  for(var i=pageStart; i<pageStart+5; i++){
     this.page = document.createElement("li");
     this.pageLink = document.createElement("a");
     this.pageLink.className = "pagenum";
@@ -38,7 +41,7 @@ var Pagination = function(numPages){
     this.page.appendChild(this.pageLink);
     this.pagination.appendChild(this.page);
   }
-
+  if(pageStart+5 <numPages) this.pagination.insertAdjacentHTML('afterend','...');
   function attachPageLinkListener(_pageLink, pageNum){
     _pageLink.addEventListener("click",function(e){
       console.log("page click: "+pageNum);
@@ -107,12 +110,15 @@ var loadImages = function(idx, cb){
 
 
 var goToPage = function(pageNum){
+  console.log("goToPage: "+pageNum);
   $("a.pagenum").parent().removeClass("active");
   $("a.pagenum[value='"+pageNum+"']").parent().addClass("active");
   var imgIdx = (pageNum*pageSize);
-  IMAGE_TAKER = true;
-  loadImages(imgIdx, function(){
-    currentPage = pageNum;
+  IMAGE_TAKER = false;
+  setupPages(function(imgIdx){
+    loadImages(imgIdx, function(){
+      currentPage = pageNum;
+    });
   });
 };
 
