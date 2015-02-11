@@ -59,7 +59,7 @@ Images.find({},'take',{sort:{take:-1}},function(err,_images){
       //setup the websockets with our camera data.
       //start socket.io server now as well.
       setupSockets();
-      server.listen(8081);
+      server.listen(8080);
     });
   });
 });
@@ -120,7 +120,7 @@ app.use(express.static('./public'));
 app.use('/images',express.static(global.RAW_IMG_FOLDER));
 app.use('/scaled-images',express.static(global.SCALED_IMG_FOLDER));
 
-app.listen(process.env.PORT || 8080);
+//app.listen(process.env.PORT || 8080);
 // server.listen(8081); //moving for test.
 console.log('\n--------------\nApp Running on port '.cyan+(process.env.PORT || 8080)+'\n--------------\n'.cyan);
 
@@ -130,8 +130,9 @@ var setupSockets = function(){
     console.log('socket connection created.'.yellow);
     if(!setupComplete) socket.broadcast.emit('loading', null);
     // fs.readdir(global.RAW_IMG_FOLDER,function(err,files){
-    fs.readdir(global.SCALED_IMG_FOLDER,function(err,files){
+    fs.readdir(global.SCALED_IMG_FOLDER,function(_err,files){
       //checkout /images for all image files, (exclude DS_Store);
+      console.log("error: ".red+_err);
       Images.findOrCreate(_.without(files, ".DS_Store"),function(err,_images){
         if(err) return socket.emit('error',err);
         return socket.broadcast.emit('init',_images);

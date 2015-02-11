@@ -1,5 +1,5 @@
 
-var socket = io.connect(window.location.hostname+':8081');
+var socket = io.connect(window.location.hostname+':8080');
 
 socket.on('init', function(images){
 
