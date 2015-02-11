@@ -19,12 +19,14 @@ var Cameras = require('./components/cameras.js');
 
 var cameras = 'test';
 
+var Takes = require('./components/takes');
+var takes = new Takes();
 global.TAKES = 0; /*** THIS NEEDS TO GO ***/
 
 /* Image folders */
 global.RAW_IMG_FOLDER = __dirname+'/images';
 global.SCALED_IMG_FOLDER = __dirname+'/scaled-images';
-global.REMOTE_PATH = '/Volumes/livingroom';//'/Users/chris';//'/Volumes/livingroom';
+global.REMOTE_PATH = '/Users/chris';//'/Volumes/livingroom';
 global.APPROVED_FOLDER = global.REMOTE_PATH+'/Desktop/NIKE_PUBLIC/approved';//'/Volumes/c/'; //__dirname+'/../../approved';
 global.HEARTED_FOLDER  = global.REMOTE_PATH+'/Desktop/NIKE_PUBLIC/hearted';//'/Volumes/c/'; //__dirname+'/../../hearted';
 global.SOCIAL_FOLDER   =  global.REMOTE_PATH+'/Desktop/NIKE_PUBLIC/social';
@@ -45,8 +47,8 @@ var setupComplete = false; //camera setup
 //if mac osx prep cameras by ensuring no photo software is running or connected.
 Images.find({},'take',{sort:{take:-1}},function(err,_images){
   //grab TAKES NUMBER
-  if(_images.length === 0) global.TAKES = 0;
-  else global.TAKES = _images[0].take;
+  if(_images.length === 0) takes.set(0);//global.TAKES = 0;
+  else takes.set(_images[0].take);//global.TAKES = _images[0].take;
 
   var killAll = exec('killall PTPCamera gphoto2',function (error, stdout, stderr) {
     cameras = Cameras(function(e){
