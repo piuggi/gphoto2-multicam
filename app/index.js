@@ -24,7 +24,7 @@ global.TAKES = 0; /*** THIS NEEDS TO GO ***/
 /* Image folders */
 global.RAW_IMG_FOLDER = __dirname+'/images';
 global.SCALED_IMG_FOLDER = __dirname+'/scaled-images';
-global.REMOTE_PATH = '/Users/chris';//'/Volumes/livingroom';
+global.REMOTE_PATH = '/Volumes/livingroom';//'/Users/chris';//'/Volumes/livingroom';
 global.APPROVED_FOLDER = global.REMOTE_PATH+'/Desktop/NIKE_PUBLIC/approved';//'/Volumes/c/'; //__dirname+'/../../approved';
 global.HEARTED_FOLDER  = global.REMOTE_PATH+'/Desktop/NIKE_PUBLIC/hearted';//'/Volumes/c/'; //__dirname+'/../../hearted';
 global.SOCIAL_FOLDER   =  global.REMOTE_PATH+'/Desktop/NIKE_PUBLIC/social';
@@ -132,10 +132,10 @@ var setupSockets = function(){
     // fs.readdir(global.RAW_IMG_FOLDER,function(err,files){
     fs.readdir(global.SCALED_IMG_FOLDER,function(_err,files){
       //checkout /images for all image files, (exclude DS_Store);
-      console.log("error: ".red+_err);
+      //console.log("error: ".red+_err);
       Images.findOrCreate(_.without(files, ".DS_Store"),function(err,_images){
         if(err) return socket.emit('error',err);
-        return socket.broadcast.emit('init',_images);
+        return socket.emit('init',_images);
       });
     });
 

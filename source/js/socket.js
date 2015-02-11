@@ -2,7 +2,7 @@
 var socket = io.connect(window.location.hostname+':8080');
 
 socket.on('init', function(images){
-
+  console.log(">> socket.on: init");
   allImages = images;
   console.log("allImages length: "+allImages.length);
 
