@@ -5,10 +5,10 @@ socket.on('init', function(images){
   console.log(">> socket.on: init");
   allImages = images;
   console.log("allImages length: "+allImages.length);
-
+  IMAGE_TAKER = true;
   setupPages(function(imgIdx){
     loadImages(imgIdx, function(){
-
+      IMAGE_TAKER = false;
     });
   });
 });

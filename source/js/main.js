@@ -69,10 +69,10 @@ var setupPages = function(cb){
   navPageList.removeChild(navPageList.firstChild); //get rid of entire <ul>
   navPageList.appendChild(new Pagination(totalPages));
 
-  currentPage = totalPages-1;
-  var imgIdx = (currentPage*pageSize);
-  $("a.pagenum[value='"+currentPage+"']").parent().addClass("active");
+  if(IMAGE_TAKER) currentPage = totalPages-1;  
 
+  $("a.pagenum[value='"+currentPage+"']").parent().addClass("active");
+  var imgIdx = (currentPage*pageSize);
   cb(imgIdx);
 };
 
