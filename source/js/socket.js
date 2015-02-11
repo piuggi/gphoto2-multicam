@@ -45,8 +45,9 @@ socket.on('new-image', function(image){
 socket.on('finished', function(){
   console.log("socket: finished");
   //location.reload();
+  IMAGE_TAKER = (currentPage == totalPages-1)? true : false; //if we're on the last page, then update
   setupPages(function(imgIdx){
-    if(IMAGE_TAKER){
+    if(IMAGE_TAKER || onCurrPage){
      loadImages(imgIdx, function(){
         $('#processingDialog').modal('hide');
         $('#loadingDialog').modal('hide');
