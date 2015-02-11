@@ -34,8 +34,8 @@ var _ButtonToolbar = function(image){
   this.btngroup.setAttribute("role", "group");
 
   this.btngroup.appendChild(new _Button(image,'details', 'search',false));
-  this.btngroup.appendChild(new _Button(image,'approve', 'ok', image.hearted));
-  this.btngroup.appendChild(new _Button(image,'heart', 'heart', image.approved));
+  this.btngroup.appendChild(new _Button(image,'approve', 'ok', image.approved));
+  this.btngroup.appendChild(new _Button(image,'heart', 'heart', image.hearted));
 
   this.imagePath = document.createTextNode(image.path);
   this.imgLabel = document.createElement("p");
@@ -57,27 +57,56 @@ var _Button = function(image,cl,glyph,state){
 
   this.btn = document.createElement("button");
 
-  if(cl == 'approve') this.btn.className = (state)? "btn btn-primary "+cl+" disabled" : "btn btn-default "+cl;
-  else if(cl == 'heart') this.btn.className = (state)? "btn btn-danger "+cl+" disabled" : "btn btn-default "+cl;
+  // if(cl === 'approve'){
+  //   console.log("set up approve button, state: "+state);
+  //   if(state){
+  //     this.btn.className = "btn btn-primary "+cl+" active";
+  //   } else {
+  //     this.btn.className = "btn btn-default "+cl +" inactive";
+  //   }
+  // }
+  // else if(cl === 'heart'){
+  //   console.log("set up heart button, state: "+state);
+  //   if(state){
+  //     this.btn.className = "btn btn-danger "+cl+" active";
+  //   } else {
+  //     this.btn.className = "btn btn-default "+cl +" inactive";
+  //   }
+  // }
+  //if(cl === 'approve') this.btn.className = (state)? "btn btn-primary "+cl+" disabled" : "btn btn-default "+cl+" active";
+  //else if(cl === 'heart') this.btn.className = (state)? "btn btn-danger "+cl+" disabled" : "btn btn-default "+cl+" active";
+
+  if(cl === 'approve') this.btn.className = (state)? "btn btn-primary "+cl+" active" : "btn btn-default "+cl+" inactive";
+  else if(cl === 'heart') this.btn.className = (state)? "btn btn-danger "+cl+" active" : "btn btn-default "+cl+" inactive";
   else this.btn.className = (state)? "btn btn-default "+cl+" disabled" : "btn btn-default "+cl;
 
   this.btn.setAttribute("role", "button");
   this.btn.setAttribute("type", "button");
-  this.btn.addEventListener("click",function(e){
-    switch(cl){
-      case 'approve':
-      case 'heart':
-        //console.log('here');
-        if(!state){
-          socket.emit(cl,{_id: image._id});
-          if(cl == 'approve') _this.btn.className = "btn btn-primary "+cl+" disabled";
-          else if(cl == 'heart') _this.btn.className = "btn btn-danger "+cl+" disabled";
-        }
-        break;
-      default:
-        break;
-    }
-  });
+  if(state == false){
+    this.btn.addEventListener("click",function(e){
+      switch(cl){
+        case 'approve':
+          //if(state == false){
+            socket.emit(cl,{_id: image._id});
+            _this.btn.className = "btn btn-primary "+cl+" active";
+            //if(cl === 'approve') _this.btn.className = "btn btn-primary "+cl+" active";
+            //else if(cl === 'heart') _this.btn.className = "btn btn-danger "+cl+" active";
+          //}
+          break;
+        case 'heart':
+          //console.log('here');
+          //if(state == false){
+            socket.emit(cl,{_id: image._id});
+            _this.btn.className = "btn btn-danger "+cl+" active";
+            //if(cl === 'approve') _this.btn.className = "btn btn-primary "+cl+" active";
+            //else if(cl === 'heart') _this.btn.className = "btn btn-danger "+cl+" active";
+          //}
+          break;
+        default:
+          break;
+      }
+    });
+  }
   this.btn.appendChild(this.span);
 
   return this.btn;
