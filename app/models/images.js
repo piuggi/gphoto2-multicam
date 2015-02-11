@@ -15,7 +15,7 @@ var Images = mongoose.Schema({
 
 Images.pre('save',function(next){
 
-  this.take = this.path.substr(0,1);
+  this.take = this.path.substr(0,this.path.indexOf('_'));
   this.camera = this.path.substr(this.path.indexOf('_')+1,1);
   next();
 });
