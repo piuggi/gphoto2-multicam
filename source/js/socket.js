@@ -14,20 +14,29 @@ socket.on('init', function(images){
 
 socket.on('approved', function(image){
   console.log('approved: \n %s',JSON.stringify(image));
+  var thisImgIdx = _.findIndex(allImages, {'_id':image._id});
+  allImages[thisImgIdx].approved = true;
+
   var imageElm = document.getElementsByClassName(image._id)[0];
-  //console.log(imageElm);
-  var button = imageElm.getElementsByClassName('approve')[0];
-  button.className = "btn btn-primary approve active";
-  console.log(button.className);
+  if(imageElm){ //we are on the page of this newly approved item
+    //console.log(imageElm);
+    var button = imageElm.getElementsByClassName('approve')[0];
+    button.className = "btn btn-primary approve active";
+  }
 });
 
 
 socket.on('hearted', function(image){
   console.log('hearted: \n %s',JSON.stringify(image));
+  var thisImgIdx = _.findIndex(allImages, {'_id':image._id});
+  allImages[thisImgIdx].hearted = true;
+
   var imageElm = document.getElementsByClassName(image._id)[0];
-  //console.log(imageElm);
-  var button = imageElm.getElementsByClassName('heart')[0];
-  button.className = "btn btn-danger heart active";
+  if(imageElm){
+    //console.log(imageElm);
+    var button = imageElm.getElementsByClassName('heart')[0];
+    button.className = "btn btn-danger heart active";
+  }
 });
 
 
