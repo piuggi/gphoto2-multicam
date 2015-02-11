@@ -16,32 +16,40 @@ $(document).ready(function(){
 });
 
 
-var Pagination = function(numPages){
+var Pagination = function(thisPage, numPages){
   this.pagination = document.createElement("ul");
   this.pagination.className = "pagination pagination-lg";
 
   this.previous = document.createElement("li");
   this.previous.insertAdjacentHTML('afterbegin', '<a href="#" class="prev-page" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>');
   this.pagination.appendChild(this.previous);
-  var pageStart = 0;
-  if(numPages > 5){
-    pageStart = numPages-5;
-    this.pagination.insertAdjacentHTML('afterbegin', '...');
+  var pageStart = numPages;
+  if(numPages > 6){
+    pageStart = numPages-3;
+    //this.pagination.insertAdjacentHTML('afterbegin', '...');
   }
-  for(var i=pageStart; i<pageStart+5; i++){
-    this.page = document.createElement("li");
-    this.pageLink = document.createElement("a");
-    this.pageLink.className = "pagenum";
-    this.pageLink.setAttribute("value", i);
-
-    attachPageLinkListener(this.pageLink, i);
-
-    this.pageNumber = document.createTextNode(i);
-    this.pageLink.appendChild(this.pageNumber);
-    this.page.appendChild(this.pageLink);
-    this.pagination.appendChild(this.page);
+  if(thisPage){
+    pageStart = thisPage;
   }
-  if(pageStart+5 <numPages) this.pagination.insertAdjacentHTML('afterend','...');
+  // var below = (pageStart>3)? 3 : 3-pageStart;
+  var below = ((pageStart+3)>numPages)? 2+(numPages-pageStart) : 3;
+  var above = ((pageStart-3)<0) ? pageStart : 3;
+  for(var i=pageStart-below; i<pageStart+above; i++){
+    if(i<numPages && i>=0){
+      this.page = document.createElement("li");
+      this.pageLink = document.createElement("a");
+      this.pageLink.className = "pagenum";
+      this.pageLink.setAttribute("value", i);
+
+      attachPageLinkListener(this.pageLink, i);
+
+      this.pageNumber = document.createTextNode(i);
+      this.pageLink.appendChild(this.pageNumber);
+      this.page.appendChild(this.pageLink);
+      this.pagination.appendChild(this.page);
+    }
+  }
+  //if(pageStart+5 <numPages) this.pagination.insertAdjacentHTML('afterend','...');
   function attachPageLinkListener(_pageLink, pageNum){
     _pageLink.addEventListener("click",function(e){
       console.log("page click: "+pageNum);
@@ -65,14 +73,15 @@ var Pagination = function(numPages){
 
 
 
-var setupPages = function(cb){
+var setupPages = function(pageNum, cb){
   totalPages = Math.ceil(allImages.length / pageSize);
   console.log("setupPages, totalPages: "+totalPages);
   var navPageList = document.getElementById("page-list");
   navPageList.removeChild(navPageList.firstChild); //get rid of entire <ul>
-  navPageList.appendChild(new Pagination(totalPages));
+  navPageList.appendChild(new Pagination(pageNum, totalPages));
 
   if(IMAGE_TAKER) currentPage = totalPages-1;
+  else currentPage = pageNum;
 
   $("a.pagenum[value='"+currentPage+"']").parent().addClass("active");
   var imgIdx = (currentPage*pageSize);
@@ -113,9 +122,9 @@ var goToPage = function(pageNum){
   console.log("goToPage: "+pageNum);
   $("a.pagenum").parent().removeClass("active");
   $("a.pagenum[value='"+pageNum+"']").parent().addClass("active");
-  var imgIdx = (pageNum*pageSize);
+  // var imgIdx = (pageNum*pageSize);
   IMAGE_TAKER = false;
-  setupPages(function(imgIdx){
+  setupPages(pageNum,function(imgIdx){
     loadImages(imgIdx, function(){
       currentPage = pageNum;
     });

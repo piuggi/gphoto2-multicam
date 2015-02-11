@@ -6,7 +6,7 @@ socket.on('init', function(images){
   allImages = images;
   console.log("allImages length: "+allImages.length);
   IMAGE_TAKER = true;
-  setupPages(function(imgIdx){
+  setupPages(null, function(imgIdx){
     loadImages(imgIdx, function(){
       // IMAGE_TAKER = false;
     });
@@ -46,7 +46,7 @@ socket.on('finished', function(){
   console.log("socket: finished");
   //location.reload();
   IMAGE_TAKER = (currentPage == totalPages-1)? true : false; //if we're on the last page, then update
-  setupPages(function(imgIdx){
+  setupPages(null, function(imgIdx){
     if(IMAGE_TAKER || onCurrPage){
      loadImages(imgIdx, function(){
         $('#processingDialog').modal('hide');
