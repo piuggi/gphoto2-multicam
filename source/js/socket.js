@@ -46,10 +46,13 @@ socket.on('finished', function(){
   console.log("socket: finished");
   //location.reload();
   setupPages(function(imgIdx){
-   loadImages(imgIdx, function(){
-      $('#processingDialog').modal('hide');
-      $('#loadingDialog').modal('hide');
-    });
+    if(IMAGE_TAKER){
+     loadImages(imgIdx, function(){
+        $('#processingDialog').modal('hide');
+        $('#loadingDialog').modal('hide');
+        IMAGE_TAKER = false;
+      });
+    }
   });
 });
 

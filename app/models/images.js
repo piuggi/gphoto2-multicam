@@ -116,7 +116,7 @@ var scaleImage = function(img, rawPath, outputPath, cb){
   lwip.open(rawPath, function(err, image){
 
     image.batch()
-      .scale(0.25)          // scale to 75%
+      .scale(0.15)
       // .rotate(45, 'white')  // rotate 45degs clockwise (white fill)
       // .crop(200, 200)       // crop a 200X200 square from center
       // .blur(5)              // Gaussian blur with SD=5

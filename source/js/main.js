@@ -4,10 +4,12 @@ var pageSize = 10; //how many images per page to show
 var totalPages;
 var currentPage;
 var allImages = [];
+var IMAGE_TAKER = false;
 
 $(document).ready(function(){
   console.log("pageSize: "+pageSize + " imgs per page");
   $('.take-photo').click(function(e){
+    IMAGE_TAKER = true;
     $('#processingDialog').modal('show');
     socket.emit('snap',{snap: 0});
   });
