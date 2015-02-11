@@ -8,7 +8,9 @@ var gulp = require('gulp'),
     notify = require('gulp-notify'),
     cache = require('gulp-cache'),
     livereload = require('gulp-livereload'),
-    del = require('del');
+    del = require('del'),
+    colors = require('colors'),
+    bKill = false;
 
     var LessPluginCleanCSS = require("less-plugin-clean-css"),
         cleancss = new LessPluginCleanCSS({advanced: true});
@@ -52,14 +54,23 @@ gulp.task('default',['clean'],function(){
 });
 
 gulp.task('startup',function(cb){
+  startApp(cb);
+});
+
+var startApp = function(cb){
   if(App) App.kill('SIGTERM');
   App = require('child_process').fork('app',[]);
   App.on('close', function (code, signal) {
-    console.log('Express App '+App.pid+' terminated due to receipt of signal '+signal);
+    console.log('Express Application '.gray+'%s'.red+' terminated due to receipt of signal '.gray+'%s'.red,App.pid,signal);
     App.connected = false;
+    if(bKill) {
+      console.log('Good Bye.'.red);
+      process.exit(1);
+      }
+    startApp(cb);
   });
   cb();
-});
+};
 
 gulp.task('watch', function() {
   // Watch .scss files
@@ -84,8 +95,8 @@ gulp.task('watch', function() {
 });
 
 process.on('SIGINT', function() {
+  bKill = true;
   App.kill('SIGTERM');
-  console.log('');
-  console.log('Got Close Signal Killing App.');
-  process.exit(1);
+  console.log('\nSorry to see you go.'.green);
+  console.log('Close Signal... Killing App.'.yellow);
 });
