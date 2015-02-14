@@ -54,6 +54,7 @@ Cameras.prototype.takePhotos = takePhotos =  function(_cb){
     console.log("take picture on cam: "+JSON.stringify(cam));
     cam.takePicture({
       targetPath: '/tmp/foo.XXXXXX'
+      //targetPath: __dirname+'/tmp/foo.XXXXXX'
       }, function (er, tmpname) {
         console.log("tmpname: "+tmpname);
         if(!tmpname){
@@ -67,7 +68,10 @@ Cameras.prototype.takePhotos = takePhotos =  function(_cb){
         var filePath = global.RAW_IMG_FOLDER+'/'+current_take+'_'+cam.id+'_'+(now.getMonth() + 1) + '' + now.getDate() + '' +  now.getFullYear() +'.'+now.getHours()+'.'+now.getMinutes()+'.'+now.getSeconds()+'.'+now.getMilliseconds()+'.jpg';
         //--- asynchronous file copy
         fs.rename(tmpname, filePath.toString(), function(_er){
-          if(_er) return cb(_er);
+          if(_er){
+            console.log("error: camid "+cam.id)
+            return cb(_er);
+          }
           cb(er);
         });
       });

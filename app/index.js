@@ -24,18 +24,23 @@ var takes = new Takes();
 var processingTake = false;
 
 /* Image folders */
+// global.RAW_IMG_FOLDER = '/Volumes/Media/NIKE_LOCAL/images';//__dirname+'/images';
+// global.SCALED_IMG_FOLDER = '/Volumes/Media/NIKE_LOCAL/thumbs';//__dirname+'/scaled-images';
 global.RAW_IMG_FOLDER = __dirname+'/images';
 global.SCALED_IMG_FOLDER = __dirname+'/scaled-images';
-global.REMOTE_PATH = '/Volumes/livingroom';//'/Users/chris';//'/Volumes/livingroom';
-global.APPROVED_FOLDER = global.REMOTE_PATH+'/Desktop/NIKE_PUBLIC/approved';//'/Volumes/c/'; //__dirname+'/../../approved';
-global.HEARTED_FOLDER  = global.REMOTE_PATH+'/Desktop/NIKE_PUBLIC/hearted';//'/Volumes/c/'; //__dirname+'/../../hearted';
-global.SOCIAL_FOLDER   =  global.REMOTE_PATH+'/Desktop/NIKE_PUBLIC/social';
+
+// global.APPROVED_FOLDER = '/Users/controlfreak/Desktop/NIKE_PUBLIC/approved';//'/Volumes/c/'; //__dirname+'/../../approved';
+// global.HEARTED_FOLDER  = '/Users/controlfreak/Desktop/NIKE_PUBLIC/hearted';//'/Volumes/c/'; //__dirname+'/../../hearted';
+// global.SOCIAL_FOLDER   = '/Users/controlfreak/Desktop/NIKE_PUBLIC/social';
+global.HEARTED_FOLDER  = '/Volumes/heart';//global.REMOTE_PATH+'/Desktop/NIKE_PUBLIC/hearted';//'/Volumes/c/'; //__dirname+'/../../hearted';
+global.SOCIAL_FOLDER   =  '/Volumes/raw';//global.REMOTE_PATH+'/Desktop/NIKE_PUBLIC/social';
+global.APPROVED_FOLDER = '/Volumes/star';//global.REMOTE_PATH+'/Desktop/NIKE_PUBLIC/approved';//'/Volumes/c/'; //__dirname+'/../../approved';
 
 if (!fs.existsSync(global.RAW_IMG_FOLDER)) fs.mkdirSync(global.RAW_IMG_FOLDER);
 if (!fs.existsSync(global.SCALED_IMG_FOLDER)) fs.mkdirSync(global.SCALED_IMG_FOLDER);
-if (!fs.existsSync(global.APPROVED_FOLDER)) fs.mkdirSync(global.APPROVED_FOLDER);
-if (!fs.existsSync(global.HEARTED_FOLDER)) fs.mkdirSync(global.HEARTED_FOLDER);
-if (!fs.existsSync(global.SOCIAL_FOLDER)) fs.mkdirSync(global.SOCIAL_FOLDER);
+// if (!fs.existsSync(global.APPROVED_FOLDER)) fs.mkdirSync(global.APPROVED_FOLDER);
+// if (!fs.existsSync(global.HEARTED_FOLDER)) fs.mkdirSync(global.HEARTED_FOLDER);
+// if (!fs.existsSync(global.SOCIAL_FOLDER)) fs.mkdirSync(global.SOCIAL_FOLDER);
 
 var Images = require(__dirname+'/models/images');
 
@@ -52,10 +57,10 @@ Images.find({},'take',{sort:{take:-1}},function(err,_images){
 
   var killAll = exec('killall PTPCamera gphoto2',function (error, stdout, stderr) {
     cameras = Cameras(function(e){
-      if(e){
-        return console.log("camera setup failed: ".red + e);
-        //TODO: socket.emit('error', e);
-      }
+      // if(e){
+      //   return console.log("camera setup failed: ".red + e);
+      //   //TODO: socket.emit('error', e);
+      // }
       console.log("camera setup complete".green);
       setupComplete = true;
       //setup the websockets with our camera data.
@@ -70,7 +75,7 @@ Images.find({},'take',{sort:{take:-1}},function(err,_images){
 var watchr = require('watchr');
 var fileCounter = 0;
 watchr.watch({
-  path:'./app/images/',
+  path: global.RAW_IMG_FOLDER,
   listener:  function(changeType,filePath,fileCurrentStat,filePreviousStat){
     //console.log('filePreviousStat: '.cyan+filePreviousStat);
     //console.log('fileCurrentStat: '.cyan+fileCurrentStat);
@@ -170,6 +175,10 @@ var setupSockets = function(){
         processingTake = true;
         console.log('Snap Photo! '.green+JSON.stringify(data));
         cameras.takePhotos(function(e){});
+        //*****NEW****
+        io.sockets.emit('finished', null);
+        processingTake = false;
+        //*******
       } else console.log('Snap Photo: '+'Wait for previous take to finish processing'.red);
     });
   });
